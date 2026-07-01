@@ -236,32 +236,38 @@ const CLASSES=["Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight"
 
 
 function SAMPLE_PROFILE(){ return { player:{
-  characteristics:{ v:1, IC:"achievement_character_dwarf_male",
-    TI:"", FN:"Baern", LN:"Ironmantle", FT:"Emberbound",
-    RA:"Dark Iron Dwarf", CL:"Forgekeeper", CH:"e57d3a",
-    AG:"152", EC:"Ember-orange", HE:"4'7\"", WE:"Stocky, forge-built",
-    BP:"Shadowforge City", RE:"The Undying Forge",
+  characteristics:{ v:1, IC:"achievement_character_human_male",
+    TI:"Ser", FN:"Aldric", LN:"Dawnmere", FT:"the Vow-Keeper",
+    RA:"Human", CL:"Paladin", CH:"f58cba",
+    AG:"34", EC:"Pale gold", HE:"6'1\"", WE:"Broad, weathered",
+    BP:"Lordaeron", RE:"Stormwind, Cathedral Quarter",
     PS:[
-      {LT:"Chaotic",RT:"Lawful",VA:15,LC:"b5481f",RC:"caa24a",LI:"spell_fire_fire",RI:"inv_hammer_16"},
-      {LT:"Gentle",RT:"Brutal",VA:6,LC:"6fa8dc",RC:"7a2d12",LI:"spell_holy_sealofwisdom",RI:"ability_warrior_decisivestrike"},
-      {LT:"Ascetic",RT:"Bon vivant",VA:8,LC:"888888",RC:"d24b01",LI:"inv_misc_food_15",RI:"inv_drink_05"}
+      {LT:"Chaotic",RT:"Lawful",VA:16,LC:"7a2d12",RC:"caa24a",LI:"spell_shadow_shadowfiend",RI:"spell_holy_sealofrighteousness"},
+      {LT:"Forgiving",RT:"Vindictive",VA:6,LC:"6fa8dc",RC:"7a2d12",LI:"spell_holy_layonhands",RI:"ability_warrior_punishingblow"},
+      {LT:"Cautious",RT:"Impulsive",VA:9,LC:"888888",RC:"d24b01",LI:"spell_holy_devotionaura",RI:"ability_warrior_charge"}
     ],
     MI:[
-      {IC:"inv_hammer_16",NA:"Order",VA:"The Order of the Undying Forge"},
-      {IC:"inv_misc_book_11",NA:"Creed",VA:"Carry the ember. Leave the warmth."}
+      {IC:"inv_jewelry_ring_05",NA:"Pronouns",VA:"he/him"},
+      {IC:"inv_misc_book_11",NA:"Motto",VA:"The light does not waver."},
+      {IC:"inv_helmet_21",NA:"Order",VA:"Knights of the Silver Hand"}
     ],
     PE:{
-      "1":{AC:true,IC:"spell_fire_fire",TI:"The Forge",TX:"Tends an everburning hearth said never to cool. Will mend a tool or a spirit for any traveller."},
-      "2":{AC:true,IC:"inv_hammer_16",TI:"Hammer & Anvil",TX:"A master smith. Weapons, armor, and the occasional broken promise repaired."},
-      "3":{AC:true,IC:"inv_misc_book_11",TI:"Tenets",TX:"Lives by three tenets: the forge never cools, bear the hammer first, leave every hearth warmer."},
+      "1":{AC:true,IC:"inv_helmet_21",TI:"Silver Hand",TX:"A sworn Knight of the Silver Hand, raised by the order after Lordaeron fell."},
+      "2":{AC:true,IC:"spell_holy_layonhands",TI:"The Vow",TX:"Has spent three decades keeping a single promise made over a dying friend."},
+      "3":{AC:true,IC:"spell_holy_devotionaura",TI:"Faith",TX:"Quiet and steady in his devotion. Prefers deeds to declarations."},
       "4":{AC:false,IC:"inv_misc_questionmark",TI:"",TX:""},
       "5":{AC:false,IC:"inv_misc_questionmark",TI:"",TX:""}
     } },
-  about:{ v:1, TE:1, BK:23, T2:[], T3:{PH:{TX:""},PS:{TX:""},HI:{TX:""}},
-    T1:{TX: "{img:Interface\\PETBATTLES\\Weather-BurntEarth:1024:128:r}{img:Interface\\PETBATTLES\\Weather-BurntEarth:1024:128:l}\n{h1:c}{col:d24b01}Baern Ironmantle{/col}{/h1}\n{h2:c}{col:d24b01}Emberbound{/col}{/h2}\n{img:Interface\\PETBATTLES\\Weather-Windy:512:3}\n{h2:c}{col:d24b01}The Order of the Undying Forge{/col}{/h2}\n{h3:c}{col:d24b01}Tenets of the Forge{/col}{/h3}\n{img:Interface\\PETBATTLES\\Weather-Windy:512:3}\n{h3:c}{col:555555}I. The Forge Never Cools{/col}{/h3}\n{p:c}{col:555555}\nNo soul is ever finished.\nJust as steel is folded, reheated, and tempered many times before it reaches its true strength, so too is every life a work forever in progress. Pride is the belief that one's forging is complete; wisdom is knowing there is always another lesson to learn.\n\"The cold blade breaks. Return to the fire willingly.\"\n{/col}{/p}\n{img:Interface\\PETBATTLES\\Weather-Windy:512:3}\n{h3:c}{col:555555}II. Bear the Hammer Before the Flame{/col}{/h3}\n{p:c}{col:555555}\nChange begins within before it is sought in others.\nThe Emberbound do not preach perfection. They seek first to master their own temper, their own failings, and their own doubts. Only by bearing the weight of the hammer upon oneself may one offer guidance to another.\n\"Strike your own steel before judging another's.\"\n{/col}{/p}\n{img:Interface\\PETBATTLES\\Weather-Windy:512:3}\n{h3:c}{col:555555}III. Leave Every Hearth Warmer{/col}{/h3}\n{p:c}{col:555555}\nWherever you journey, leave people stronger than you found them.\nThe purpose of the road is not conquest, but kindness. Every shared meal, every mended tool, every lesson taught, every burden eased is another ember added to the world's fire. Faith is measured not by words, but by what remains after you've gone.\n\"Carry the ember. Leave the warmth.\"\n{/col}{/p}"} },
+  about:{ v:1, TE:3, BK:22, T2:[],
+    T3:{
+      PH:{TX:"A tall man in his middle years, armor kept immaculate despite obvious age. A scar crosses his left brow; his eyes are a faded, tired gold."},
+      PS:{TX:"Patient to a fault and slow to anger — but unbending once a vow is given. He distrusts spectacle and prefers deeds to declarations."},
+      HI:{TX:"Orphaned in the fall of Lordaeron, raised by the Silver Hand. He has spent three decades keeping a single promise made over a dying friend."}
+    },
+    T1:{TX:""} },
   misc:{ v:1,
-    CO:"{col:d24b01}Tending the forge.{/col} Travellers and the weary are always welcome at the hearth.",
-    CU:"Walk-up friendly. Long-form story preferred over combat-RP." }
+    CO:"Standing watch outside the Cathedral, open to petitioners.",
+    CU:"Walk-up friendly. Happy to plot long-form stories. No combat-RP without prior agreement." }
 }}; }
 </script>
 <div class="wrap">
