@@ -275,7 +275,7 @@ function SAMPLE_PROFILE(){ return { player:{
     <div class="crest">TRP</div>
     <div class="titles">
       <h1>TRP3 Forge</h1>
-      <p>Design a Total RP 3 profile outside the game — with real WoW asset names</p>
+      <p>Design a Total RP 3 profile outside the game — with real WoW assets</p>
     </div>
     <div class="spacer"></div>
     <button class="btn" id="btnNew">New</button>
@@ -361,14 +361,36 @@ function SAMPLE_PROFILE(){ return { player:{
               <div class="bgswatch" id="bgSwatch"></div>
               <select id="BK" style="max-width:280px">
                 <option value="0">None (parchment)</option>
-                <option value="1">Default parchment</option>
-                <option value="3">Marble</option>
-                <option value="7">Parchment (tileable)</option>
-                <option value="22">Alliance</option>
-                <option value="23">Dragonflight</option>
-                <option value="24">Horde</option>
-                <option value="25">Kyrian</option>
-                <option value="29">Neutral (dark)</option>
+                <option value="1">1. Olive Bark</option>
+                <option value="2">2. Dusk Umber</option>
+                <option value="3">3. Antique Brass</option>
+                <option value="4">4. Moss Field</option>
+                <option value="5">5. Twilight Slate</option>
+                <option value="6">6. Rust Clay</option>
+                <option value="7">7. Old Gold</option>
+                <option value="8">8. Bronze Earth</option>
+                <option value="9">9. Fern Shadow</option>
+                <option value="10">10. Deep Indigo</option>
+                <option value="11">11. Charcoal Brown</option>
+                <option value="12">12. Sage Stone</option>
+                <option value="13">13. Void Black</option>
+                <option value="14">14. Warm Ash</option>
+                <option value="15">15. Oxblood</option>
+                <option value="16">16. Iron Grey</option>
+                <option value="17">17. Amber Glow</option>
+                <option value="18">18. Sandstone</option>
+                <option value="19">19. Steel Blue</option>
+                <option value="20">20. Midnight</option>
+                <option value="21">21. Navy Depths</option>
+                <option value="22">22. Slate</option>
+                <option value="23">23. Pine Shadow</option>
+                <option value="24">24. Tawny Leather</option>
+                <option value="25">25. Dark Walnut</option>
+                <option value="26">26. Sea Mist</option>
+                <option value="27">27. Ember Wood</option>
+                <option value="28">28. Muted Plum</option>
+                <option value="29">29. Deep Teal</option>
+                <option value="30">30. Emerald Shade</option>
               </select>
             </div>
           </label>
@@ -634,21 +656,44 @@ function renderTRP3(src){
 
   return '<div class="trp-html">'+t+'</div>';
 }
-/* ===== TRP3 background index -> texture (mirror casing) ===== */
-const TRP_BG_BASE = "https://raw.githubusercontent.com/Gethe/wow-ui-textures/live/";
+/* ===== About-section backgrounds: 30 solid colors sampled from TRP3's own
+   palette swatches (27) plus 3 tonal additions (plum, teal, emerald). ===== */
 const TRP_BACKGROUNDS = {
-  0:{n:"None",u:""},
-  1:{n:"Default parchment",u:"DialogFrame/UI-DialogBox-Background"},
-  3:{n:"Marble",u:"FrameGeneral/UI-Background-Marble"},
-  7:{n:"Parchment (tileable)",u:"HELPFRAME/Tileable-Parchment"},
-  22:{n:"Alliance",u:"FrameGeneral/UIFrameAllianceBackground"},
-  23:{n:"Dragonflight",u:"FrameGeneral/UIFrameNeutralBackground",dark:true},
-  24:{n:"Horde",u:"FrameGeneral/UIFrameHordeBackground",dark:true},
-  25:{n:"Kyrian",u:"FrameGeneral/UIFrameKyrianBackground",dark:true},
-  29:{n:"Neutral",u:"FrameGeneral/UIFrameNeutralBackground",dark:true}
+  0:{n:"None (parchment)",c:""},
+  1:{n:"Olive Bark",c:"#3e3a23",dark:true},
+  2:{n:"Dusk Umber",c:"#3e332f",dark:true},
+  3:{n:"Antique Brass",c:"#493f28",dark:true},
+  4:{n:"Moss Field",c:"#3b402b",dark:true},
+  5:{n:"Twilight Slate",c:"#2f303e",dark:true},
+  6:{n:"Rust Clay",c:"#4e2b1e",dark:true},
+  7:{n:"Old Gold",c:"#4e4315",dark:true},
+  8:{n:"Bronze Earth",c:"#4b3615",dark:true},
+  9:{n:"Fern Shadow",c:"#3a4423",dark:true},
+  10:{n:"Deep Indigo",c:"#2f303b",dark:true},
+  11:{n:"Charcoal Brown",c:"#1e1914",dark:true},
+  12:{n:"Sage Stone",c:"#615e4d",dark:true},
+  13:{n:"Void Black",c:"#1e1e1e",dark:true},
+  14:{n:"Warm Ash",c:"#524d45",dark:true},
+  15:{n:"Oxblood",c:"#632928",dark:true},
+  16:{n:"Iron Grey",c:"#3e3e3b",dark:true},
+  17:{n:"Amber Glow",c:"#b3842f",dark:false},
+  18:{n:"Sandstone",c:"#bf9b66",dark:false},
+  19:{n:"Steel Blue",c:"#3c4052",dark:true},
+  20:{n:"Midnight",c:"#23222c",dark:true},
+  21:{n:"Navy Depths",c:"#151d2c",dark:true},
+  22:{n:"Slate",c:"#373637",dark:true},
+  23:{n:"Pine Shadow",c:"#2b2f2c",dark:true},
+  24:{n:"Tawny Leather",c:"#745b3f",dark:true},
+  25:{n:"Dark Walnut",c:"#3e362f",dark:true},
+  26:{n:"Sea Mist",c:"#626763",dark:true},
+  27:{n:"Ember Wood",c:"#552c0f",dark:true},
+  28:{n:"Muted Plum",c:"#44344c",dark:true},
+  29:{n:"Deep Teal",c:"#324c4c",dark:true},
+  30:{n:"Emerald Shade",c:"#2e473b",dark:true},
 };
-function trpBgUrl(idx){ const b=TRP_BACKGROUNDS[idx]; return (b&&b.u)?TRP_BG_BASE+b.u+".PNG":""; }
+function trpBgColor(idx){ const b=TRP_BACKGROUNDS[idx]; return (b&&b.c)?b.c:""; }
 function trpBgIsDark(idx){ const b=TRP_BACKGROUNDS[idx]; return !!(b&&b.dark); }
+
 
 /* ===== helpers ===== */
 const $ = id => document.getElementById(id);
@@ -858,8 +903,8 @@ $("t1InsertIcon").onclick=()=>openIconBrowser(name=>insertAtCursor($("T1TX"),"{i
 $("t1InsertImg").onclick=()=>openIconBrowser(name=>insertAtCursor($("T1TX"),"{img:Interface\\ICONS\\"+name+":64:64}"));
 $("t1InsertLink").onclick=()=>{ const url=prompt("Link URL:","https://"); if(url==null) return;
   const text=prompt("Link text:","")||url; insertAtCursor($("T1TX"),"{link*"+url+"*"+text+"}"); };
-function paintBgSwatch(idx){ const url=trpBgUrl(idx), sw=$("bgSwatch");
-  if(url) sw.style.backgroundImage="url('"+url+"')"; else { sw.style.backgroundImage=""; } }
+function paintBgSwatch(idx){ const col=trpBgColor(idx), sw=$("bgSwatch");
+  sw.style.backgroundImage=""; sw.style.backgroundColor = col || "#e3d3aa"; }
 $("BK").addEventListener("change",()=>{ A().BK=+$("BK").value; paintBgSwatch(A().BK); sync(); });
 function renderT2Editor(){
   const wrap=$("t2list"); wrap.innerHTML="";
@@ -952,13 +997,9 @@ function renderPreview(){
 }
 function applyAboutBackground(idx){
   const wrap=$("pvAboutWrap"); if(!wrap) return;
-  const url=trpBgUrl(idx), dark=trpBgIsDark(idx);
-  if(url){
-    const wash=dark?"linear-gradient(rgba(20,13,7,.80),rgba(20,13,7,.80)),":"linear-gradient(rgba(244,238,212,.30),rgba(244,238,212,.30)),";
-    wrap.style.backgroundImage=wash+"url('"+url+"')";
-    wrap.style.backgroundRepeat="repeat"; wrap.style.backgroundSize="auto, 256px";
-    wrap.style.backgroundColor="#160f08";
-  } else { wrap.style.backgroundImage=""; wrap.style.backgroundColor="#efe3c5"; }
+  const col=trpBgColor(idx), dark=trpBgIsDark(idx);
+  wrap.style.backgroundImage="";
+  wrap.style.backgroundColor = col || "#efe3c5";
   wrap.classList.toggle("bg-dark", dark);
 }
 
@@ -1050,7 +1091,7 @@ function normalize(obj){
 }
 
 /* ===== SAMPLE ===== */
-$("btnSample").onclick=()=>{ if(!confirmClear("Load the sample profile?")) return; P=SAMPLE_PROFILE(); loadFormFromState(); toast("Loaded sample: Baern Ironmantle"); };
+$("btnSample").onclick=()=>{ if(!confirmClear("Load the sample profile?")) return; P=SAMPLE_PROFILE(); loadFormFromState(); toast("Loaded sample: Ser Aldric Dawnmere"); };
 
 /* boot */
 loadFormFromState();
