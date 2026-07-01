@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>TRP3 Forge — Total RP 3 Profile Designer</title>
+<style>
+:root{
+  --parchment:#e9dcc0; --parchment-dk:#d8c69e; --ink:#2b2013; --ink-soft:#5a4a31;
+  --gold:#c8a24a; --gold-dk:#9a781f; --ember:#7a2d12; --ember-br:#b5481f;
+  --wood:#3a2a18; --wood-dk:#241a0f; --line:#b69b6a; --good:#3f6b2e;
+  --panel:#f3ead4; --shadow:0 2px 0 rgba(0,0,0,.25),0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  background:radial-gradient(120% 80% at 50% -10%, #4a3722 0%, #2c2013 55%, #1b130b 100%);
+  color:var(--ink); min-height:100vh; -webkit-font-smoothing:antialiased;
+}
+/* 95% of the window, not a hard pixel cap */
+.wrap{width:95%;margin:0 auto;padding:18px 0 28px;height:100vh;display:flex;flex-direction:column}
+header.top{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;flex:0 0 auto;
+  padding:12px 16px;margin-bottom:14px;
+  background:linear-gradient(180deg,#2f2415,#1d1509);
+  border:1px solid var(--gold-dk);border-radius:14px;box-shadow:var(--shadow);
+}
+.crest{width:44px;height:44px;flex:0 0 auto;border-radius:9px;
+  background:radial-gradient(circle at 35% 30%,#e7c66b,#9a781f 70%,#5a460f);
+  display:grid;place-items:center;color:#241a0f;font-weight:700;font-size:19px;
+  border:1px solid #f0d987;box-shadow:inset 0 0 8px rgba(0,0,0,.4);font-family:Georgia,serif;}
+.titles h1{margin:0;font-size:22px;letter-spacing:.5px;color:#f3e5c3;text-shadow:0 1px 0 #000}
+.titles p{margin:2px 0 0;font-size:12px;color:#c2a98a;letter-spacing:.3px}
+.spacer{flex:1 1 auto}
+.btn{font-family:inherit;cursor:pointer;border:1px solid var(--gold-dk);
+  background:linear-gradient(180deg,#f0e3c2,#d9c594);color:var(--ink);
+  padding:8px 13px;border-radius:9px;font-size:13px;font-weight:600;
+  box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 2px 0 rgba(0,0,0,.25);
+  transition:transform .06s ease,filter .15s ease;}
+.btn:hover{filter:brightness(1.05)} .btn:active{transform:translateY(1px)}
+.btn.dark{background:linear-gradient(180deg,#3a2c19,#241a0f);color:#f0deb0;border-color:#000}
+.btn.ember{background:linear-gradient(180deg,#b5481f,#7a2d12);color:#ffe9d8;border-color:#3c1607}
+.btn:focus-visible{outline:3px solid #ffd97a;outline-offset:2px}
+.btn.sm{padding:6px 10px;font-size:12px}
+
+/* Two columns that each scroll independently and fill remaining height */
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1 1 auto;min-height:0}
+@media(max-width:980px){.layout{grid-template-columns:1fr;overflow:auto}}
+.panel{background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,0)),var(--panel);
+  border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
+  position:relative;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
+.panel h2{margin:0;font-size:13px;letter-spacing:1.6px;text-transform:uppercase;
+  color:#3a2c14;padding:11px 16px;border-bottom:1px solid var(--line);flex:0 0 auto;
+  background:linear-gradient(180deg,#e7d6b0,#dcc89c);}
+.panel .scroll{overflow-y:auto;overflow-x:hidden;flex:1 1 auto;min-height:0}
+.panel .body{padding:14px 16px}
+.tabs{display:flex;gap:4px;padding:9px 12px 0;flex-wrap:wrap;flex:0 0 auto;background:transparent}
+.tab{font:inherit;font-size:12.5px;font-weight:600;letter-spacing:.4px;cursor:pointer;
+  border:1px solid var(--line);border-bottom:none;background:#d6c39a;color:#4a3a20;
+  padding:8px 13px;border-radius:9px 9px 0 0;opacity:.7;}
+.tab.active{opacity:1;background:var(--panel);transform:translateY(1px);box-shadow:0 -2px 0 var(--gold) inset}
+.tabpane{display:none} .tabpane.active{display:block}
+
+label.f{display:block;margin:0 0 11px}
+label.f > span{display:block;font-size:11px;letter-spacing:.6px;text-transform:uppercase;
+  color:var(--ink-soft);margin:0 0 4px;font-weight:600}
+input[type=text],textarea,select{width:100%;font:inherit;font-size:14px;color:var(--ink);
+  background:#fbf5e4;border:1px solid var(--line);border-radius:8px;padding:8px 10px;}
+input[type=color]{width:42px;height:34px;padding:2px;border:1px solid var(--line);border-radius:8px;background:#fbf5e4;cursor:pointer;vertical-align:middle}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--gold);border-color:var(--gold-dk)}
+textarea{resize:vertical;min-height:80px;line-height:1.5}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+@media(max-width:520px){.row,.row3{grid-template-columns:1fr}}
+.hint{font-size:12px;color:var(--ink-soft);line-height:1.5}
+.sec-h{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:#6a5320;
+  border-bottom:1px solid var(--line);padding-bottom:5px;margin:18px 0 10px;font-weight:700}
+.notice{font-size:11.5px;color:#6a5320;background:rgba(200,162,74,.14);border:1px solid var(--line);
+  border-radius:8px;padding:8px 10px;margin:0 0 12px;line-height:1.5}
+
+.iconpick{display:flex;align-items:center;gap:12px}
+.iconbtn{width:56px;height:56px;border-radius:10px;border:2px solid var(--gold-dk);
+  background:#1c140b;cursor:pointer;padding:0;overflow:hidden;flex:0 0 auto;
+  box-shadow:inset 0 0 0 2px #000, var(--shadow);position:relative;}
+.iconbtn img{width:100%;height:100%;display:block;object-fit:cover}
+.iconbtn .ph{width:100%;height:100%;display:grid;place-items:center;color:#8a724a;font-size:10px}
+.iconbtn:hover{filter:brightness(1.15)}
+
+.card{border:1px solid var(--line);border-radius:10px;padding:11px;margin:0 0 11px;
+  background:linear-gradient(180deg,#f7eed8,#efe2c4);position:relative;}
+.card .del{position:absolute;top:8px;right:8px;border:1px solid #7a2d12;background:#b5481f;color:#fff;
+  border-radius:6px;cursor:pointer;font:inherit;font-size:11px;padding:3px 8px;font-weight:600;}
+.addbtn{width:100%;border:1px dashed var(--gold-dk);background:rgba(200,162,74,.12);
+  color:#6a5320;border-radius:9px;padding:9px;cursor:pointer;font:inherit;font-weight:600;font-size:13px}
+.addbtn:hover{background:rgba(200,162,74,.22)}
+
+/* personality trait editor */
+.psyrow{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;margin-top:8px}
+.psyend{display:flex;align-items:center;gap:6px;min-width:0;flex-wrap:wrap}
+.psyend.r{justify-content:flex-end}
+.psyend .iconbtn{width:34px;height:34px;border-width:1px}
+.psyhex{width:74px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;text-transform:lowercase;padding:6px 6px}
+.slider{appearance:none;-webkit-appearance:none;height:8px;border-radius:6px;
+  background:linear-gradient(90deg,var(--ember-br),var(--gold),var(--good));outline:none;width:100%}
+.slider::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:18px;height:18px;
+  border-radius:50%;background:#f3e5c3;border:2px solid var(--wood);cursor:pointer;box-shadow:var(--shadow)}
+.slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#f3e5c3;border:2px solid var(--wood);cursor:pointer}
+.psynum{width:62px;text-align:center}
+.psylabels{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* At-a-Glance editor (5 slots) */
+.glance-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:6px}
+@media(max-width:640px){.glance-grid{grid-template-columns:repeat(5,1fr)}}
+.glance-slot{display:flex;flex-direction:column;align-items:center;gap:5px}
+.glance-slot .iconbtn{width:100%;aspect-ratio:1;height:auto}
+.glance-slot.off .iconbtn{opacity:.4;filter:grayscale(.6)}
+.glance-slot small{font-size:10px;color:var(--ink-soft);text-align:center;line-height:1.1;
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.glance-edit label.f{margin-bottom:8px}
+.glance-toggle{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-soft);cursor:pointer;user-select:none}
+
+/* ---------- Icon browser modal ---------- */
+.modal{position:fixed;inset:0;background:rgba(10,7,3,.72);display:none;z-index:50;
+  align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(2px)}
+.modal.open{display:flex}
+.modal .box{width:min(820px,96vw);max-height:88vh;display:flex;flex-direction:column;
+  background:var(--panel);border:1px solid var(--gold-dk);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.modal .box h3{margin:0;padding:13px 16px;background:linear-gradient(180deg,#2f2415,#1d1509);
+  color:#f3e5c3;font-size:14px;letter-spacing:1px;display:flex;align-items:center;gap:10px}
+.modal .box h3 .x{margin-left:auto;cursor:pointer;border:none;background:none;color:#e7c66b;font-size:20px;line-height:1}
+.modal .search{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.modal .search input{flex:1 1 220px}
+.gridicons{padding:14px 16px;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:8px}
+.gicon{width:100%;aspect-ratio:1;border:2px solid #00000044;border-radius:8px;cursor:pointer;
+  background:#1c140b;overflow:hidden;padding:0;position:relative}
+.gicon img{width:100%;height:100%;object-fit:cover;display:block}
+.gicon:hover{border-color:var(--gold);transform:scale(1.06)}
+.modal .foot{padding:10px 16px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-soft);
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.count{font-size:12px;color:var(--ink-soft)}
+
+/* ---------- Preview ---------- */
+.preview-shell{background:linear-gradient(180deg,#efe3c5,#e3d3aa);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  box-shadow:inset 0 0 40px rgba(90,60,20,.18);margin:14px 16px}
+.pv-banner{position:relative;min-height:96px;background:linear-gradient(120deg,#2c2013,#4a3722);
+  border-bottom:2px solid var(--gold-dk);display:flex;align-items:flex-end;gap:14px;padding:12px 16px}
+.pv-ic{width:72px;height:72px;border-radius:10px;border:2px solid var(--gold);overflow:hidden;
+  background:#120c06;flex:0 0 auto;box-shadow:var(--shadow);transform:translateY(16px)}
+.pv-ic img{width:100%;height:100%;object-fit:cover}
+.pv-names{color:#f3e5c3;text-shadow:0 1px 2px #000;padding-bottom:2px}
+.pv-full{font-size:23px;font-weight:700;line-height:1.05}
+.pv-fulltitle{font-size:13px;letter-spacing:.4px;font-style:italic;margin-top:2px}
+.pv-sub{font-size:13px;margin-top:3px;font-weight:600}
+.pv-body{padding:26px 18px 18px}
+.pv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;margin:0 0 14px}
+@media(max-width:520px){.pv-grid{grid-template-columns:1fr}}
+.pv-field{border-bottom:1px dotted var(--line);padding:4px 0}
+.pv-k{font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--ember)}
+.pv-v{font-size:14.5px;color:var(--ink)}
+.pv-h{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:#6a5320;
+  border-bottom:1px solid var(--line);padding-bottom:5px;margin:18px 0 10px;font-weight:700}
+/* At a glance row in preview */
+.pv-glance{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 6px}
+.pv-glance .g{width:40px;height:40px;border-radius:8px;border:2px solid var(--gold-dk);
+  overflow:hidden;background:#120c06;cursor:default;position:relative}
+.pv-glance .g img{width:100%;height:100%;object-fit:cover}
+.pv-psy{margin:0 0 9px}
+.pv-psy .lab{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--ink-soft);margin-bottom:3px;gap:8px}
+.pv-psy .lab .side{display:flex;align-items:center;gap:5px}
+.pv-psy .lab img{width:16px;height:16px;border-radius:3px}
+.pv-bar{height:10px;border-radius:6px;overflow:hidden;position:relative;border:1px solid var(--line);
+  background:linear-gradient(90deg,var(--c1,#7a2d12),var(--c2,#3f6b2e))}
+.pv-bar i{position:absolute;top:-3px;bottom:-3px;width:4px;background:#1c140b;
+  transform:translateX(-50%);box-shadow:0 0 0 2px #f3e5c3}
+.pv-misc{display:flex;align-items:center;gap:10px;margin:0 0 8px}
+.pv-misc img{width:26px;height:26px;border-radius:5px;border:1px solid var(--gold-dk);object-fit:cover;background:#120c06}
+.pv-misc b{font-size:13px;color:var(--ember);min-width:90px}
+.pv-empty{color:#8a724a;font-style:italic;font-size:13px}
+
+/* About section background applies ONLY here */
+.pv-about-wrap{margin-top:6px;border-radius:10px;padding:14px;position:relative;overflow:hidden;
+  background:#efe3c5;border:1px solid var(--line)}
+.pv-about-wrap.bg-dark{color:#e3dcc9}
+.pv-about-wrap.bg-dark .trp-html{color:#e3dcc9}
+.pv-about-wrap.bg-dark .pv-empty{color:#b39a72}
+
+/* TRP3 rendered markup */
+.trp-html{overflow:hidden;font-size:14px;line-height:1.5;color:var(--ink)}
+.trp-html .trp-h{margin:.45em 0 .12em;font-weight:700;line-height:1.15;color:inherit;background:none;border:none;padding:0}
+.trp-html h1.trp-h{font-size:26px}
+.trp-html h2.trp-h{font-size:18px}
+.trp-html h3.trp-h{font-size:16px;font-weight:600}
+.trp-html .trp-p{margin:.5em 0}
+.trp-html .trp-c{text-align:center}
+.trp-html .trp-r{text-align:right}
+.trp-html .trp-img{display:inline-block;vertical-align:middle;max-width:none}
+.trp-html .trp-img-c{display:block;margin-top:6px;margin-bottom:6px;position:relative;left:50%;transform:translateX(-50%)}
+.trp-html .trp-img-l{float:left;margin:2px 8px 4px 0}
+.trp-html .trp-img-r{float:right;margin:2px 0 4px 8px}
+.trp-html .trp-icon{vertical-align:middle;border-radius:3px;margin:0 2px}
+.trp-html a{text-decoration:underline;cursor:pointer;font-weight:600}
+.trp-html a:hover{text-decoration:none;filter:brightness(1.15)}
+.trp-html .trp-link{color:inherit;text-decoration:underline;cursor:pointer}
+.trp-html .trp-link:hover{filter:brightness(1.15)}
+.trp-html:after{content:"";display:block;clear:both}
+
+.io-area{width:100%;min-height:160px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+  background:#241a0f;color:#f3e5c3;border:1px solid var(--gold);padding:11px 18px;border-radius:10px;
+  box-shadow:var(--shadow);opacity:0;transition:.25s;z-index:80;font-size:13.5px;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{font:inherit;font-size:12px;border:none;background:#d6c39a;color:#4a3a20;padding:7px 12px;cursor:pointer}
+.seg button.on{background:var(--ink);color:#f3e5c3}
+.bgpick{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bgswatch{width:42px;height:42px;border-radius:8px;border:2px solid var(--gold-dk);
+  background-size:cover;background-position:center;flex:0 0 auto;box-shadow:var(--shadow);background-color:#e3d3aa}
+
+/* glance tooltip (preview) */
+.gtip{position:fixed;z-index:90;max-width:300px;background:#0b0805;border:1px solid var(--gold);
+  border-radius:8px;padding:10px 12px;box-shadow:var(--shadow);pointer-events:none;display:none}
+.gtip.show{display:block}
+.gtip .tt{display:flex;align-items:center;gap:8px;color:#ffd97a;font-weight:700;font-size:14px;margin-bottom:5px}
+.gtip .tt img{width:26px;height:26px;border-radius:5px;border:1px solid var(--gold-dk)}
+.gtip .tb{color:#e9dcc0;font-size:12.5px;line-height:1.45;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<script>
+const BUNDLED_ICONS=["class_monk", "classicon_deathknight", "classicon_druid", "classicon_hunter", "classicon_mage", "classicon_monk", "classicon_paladin", "classicon_priest", "classicon_rogue", "classicon_shaman", "classicon_warlock", "classicon_warrior", "classicon_demonhunter", "classicon_evoker_devastation", "classicon_evoker_preservation", "classicon_evoker", "classicon_evoker_augmentation", "classicon_demonhunter_void", "classicon_demonhunter_void_256", "inv_bracer_01", "inv_bracer_02", "inv_bracer_03", "inv_bracer_04", "inv_bracer_05", "inv_bracer_06", "inv_bracer_07", "inv_bracer_08", "inv_bracer_09", "inv_bracer_10", "inv_bracer_11", "inv_bracer_12", "inv_bracer_13", "inv_bracer_14", "inv_bracer_15", "inv_bracer_16", "inv_bracer_17", "inv_bracer_18", "inv_bracer_19", "inv_relics_libramofgrace", "spell_holy_championsgrace", "spell_holy_elunesgrace", "spell_holy_lightsgrace", "spell_shadow_improvedvampiricembrace", "spell_shadow_shadowembrace", "inv_bracer_20", "inv_bracer_20a", "inv_bracer_20b", "inv_bracer_21", "inv_bracer_21a", "inv_bracer_21b", "inv_bracer_21c", "inv_bracer_22", "inv_bracer_22a", "inv_bracer_22b", "inv_bracer_22c", "inv_bracer_23", "inv_bracer_23a", "inv_bracer_23b", "inv_bracer_24", "inv_bracer_24a", "inv_bracer_24b", "inv_bracer_25", "inv_bracer_25a", "inv_bracer_25b", "inv_bracer_26", "inv_bracer_26a", "inv_bracer_26b", "inv_bracer_27", "inv_bracer_27a", "inv_bracer_27b", "inv_bracer_28", "inv_bracer_28a", "inv_bracer_28b", "inv_bracer_29", "inv_bracer_29a", "inv_bracer_29b", "inv_bracer_30", "inv_bracer_30a", "inv_bracer_30b", "achievement_character_bloodelf_female", "achievement_character_bloodelf_male", "achievement_character_draenei_female", "achievement_character_draenei_male", "achievement_character_dwarf_female", "achievement_character_dwarf_male", "achievement_character_gnome_female", "achievement_character_gnome_male", "achievement_character_human_female", "achievement_character_human_male", "achievement_character_nightelf_female", "achievement_character_nightelf_male", "achievement_character_orc_female", "achievement_character_orc_male", "achievement_character_tauren_female", "achievement_character_tauren_male", "achievement_character_troll_female", "achievement_character_troll_male", "achievement_character_undead_female", "achievement_character_undead_male", "achievement_character_pandaren_female", "achievement_character_orc_female_brn", "achievement_character_orc_male_brn", "inv_helm_mask_zulgurub_d_01", "inv_helmet_01", "inv_helmet_02", "inv_helmet_03", "inv_helmet_04", "inv_helmet_05", "inv_helmet_06", "inv_helmet_07", "inv_helmet_08", "inv_helmet_09", "inv_helmet_10", "inv_helmet_100", "inv_helmet_101", "inv_helmet_102", "inv_helmet_103", "inv_helmet_104", "inv_helmet_105", "inv_helmet_106", "inv_helmet_107", "inv_helmet_108", "inv_helmet_109", "inv_helmet_11", "inv_helmet_110", "inv_helmet_111", "inv_helmet_112", "inv_helmet_113", "inv_helmet_114", "inv_helmet_115", "inv_helmet_116", "inv_helmet_117", "inv_helmet_118", "inv_helmet_119", "inv_helmet_12", "inv_helmet_120", "inv_helmet_121", "inv_helmet_122", "inv_helmet_123", "inv_helmet_124", "inv_helmet_125", "inv_helmet_126", "inv_helmet_127", "inv_helmet_129", "inv_helmet_13", "inv_helmet_130", "inv_helmet_131", "inv_helmet_132", "inv_helmet_133", "inv_helmet_14", "inv_helmet_15", "inv_helmet_16", "inv_helmet_17", "inv_helmet_18", "inv_helmet_19", "inv_helmet_20", "inv_helmet_21", "inv_helmet_22", "inv_helmet_23", "inv_helmet_24", "inv_helmet_25", "inv_helmet_26", "inv_helmet_27", "inv_helmet_28", "inv_helmet_29", "inv_helmet_30", "inv_helmet_31", "inv_helmet_32", "inv_helmet_33", "inv_helmet_34", "inv_helmet_35", "inv_helmet_36", "inv_helmet_37", "inv_helmet_38", "inv_helmet_39", "inv_helmet_40", "inv_helmet_41", "inv_helmet_42", "inv_helmet_43", "inv_helmet_44", "inv_helmet_45", "inv_helmet_46", "inv_helmet_47", "inv_helmet_48", "inv_helmet_49", "inv_helmet_50", "inv_helmet_51", "inv_helmet_52", "inv_helmet_53", "inv_helmet_54", "inv_helmet_55", "inv_helmet_56", "inv_helmet_57", "inv_helmet_58", "inv_helmet_59", "inv_helmet_60", "inv_helmet_61", "inv_helmet_62", "inv_helmet_63", "inv_helmet_64", "inv_helmet_65", "inv_helmet_66", "inv_helmet_67", "inv_helmet_68", "inv_helmet_69", "inv_helmet_70", "inv_helmet_71", "inv_helmet_72", "inv_helmet_73", "inv_helmet_74", "inv_helmet_77", "inv_helmet_78", "inv_helmet_81", "inv_helmet_84", "inv_helmet_85", "inv_helmet_86", "inv_helmet_87", "inv_helmet_88", "inv_helmet_89", "inv_helmet_90", "inv_helmet_91", "inv_helmet_92", "inv_helmet_93", "inv_helmet_94", "inv_helmet_95", "inv_helmet_96", "inv_helmet_97", "inv_helmet_98", "inv_helmet_99", "inv_helmet_134", "inv_helmet_135", "inv_helmet_136", "inv_helmet_137", "inv_helmet_138", "inv_helmet_139", "inv_helmet_140", "inv_helmet_141", "inv_helmet_142", "inv_helmet_144a", "inv_helmet_144b", "inv_helmet_145a", "inv_helmet_145b", "inv_helmet_146", "inv_helmet_147", "inv_helmet_149", "inv_helmet_150", "inv_helmet_151", "inv_helmet_152", "inv_helmet_148", "inv_helmet_153", "inv_helmet_150black", "inv_helmet_150green", "inv_helmet_150purple", "inv_helmet_154", "inv_helmet_155", "inv_helmet_156", "inv_helmet_157", "inv_helmet_158", "inv_helmet_159", "inv_helmet_160", "inv_helmet_161", "inv_helmet_164", "inv_helmet_165", "inv_helmet_166", "inv_helmet_168", "inv_helmet_169", "inv_helmet_170", "inv_helmet_171", "inv_helmet_173", "inv_helmet_174", "inv_helmet_150red", "inv_helmet_175", "inv_helmet_176", "inv_helmet_177", "inv_helmet_178", "inv_helmet_179", "inv_helmet_180", "inv_helmet_182", "inv_helmet_183", "inv_helmet_184", "inv_helmet_185", "inv_helmet_181", "inv_helmet_186", "inv_helm_plate_pvpdeathknight_c_01", "inv_helmet_187", "inv_helmet_188", "inv_helmet_leather_pvprogue_c_01", "inv_helm_plate_twilighthammer_c_01", "inv_helmet_189", "inv_helm_robe_dungeonrobe_c_04", "inv_helm_robe_pvppriest_c_01", "inv_helmet_190", "inv_helmet_robe_dungeonrobe_c_03", "inv_helmet_cloth_cataclysm_b_01", "inv_helm_cloth_pvpmage_c_01", "inv_helmet_leather_cataclysm_b_01", "inv_helmet_plate_dungeonplate_c_03", "inv_helmet_191", "inv_helmet_robe_common_c_01", "inv_helmet_mail_dungeonmail_c_03", "inv_helm_plate_pvpwarrior_c_02", "inv_helmet_cloth_cataclysm_b_02", "inv_helm_plate_pvpwarrior_c_01", "inv_helmet_192", "inv_helmet_173v2", "inv_helmet_173v3", "inv_helmet_173v4", "inv_helmet_181v2", "inv_helmet_181v3", "inv_helmet_181v4", "inv_helmet_186v2", "inv_helmet_186v3", "inv_helmet_186v4", "inv_helmet_193", "inv_helmet_plate_dungeonplage_c_04", "inv_helmet_174v1", "inv_helmet_174v2", "inv_helmet_174v3", "inv_helmet_175v1", "inv_helmet_175v2", "inv_helmet_175v3", "inv_helmet_177v1", "inv_helmet_177v2", "inv_helmet_177v3", "inv_helmet_178v1", "inv_helmet_178v2", "inv_helmet_178v3", "inv_helmet_179v1", "inv_helmet_179v2", "inv_helmet_179v3", "inv_helmet_180v1", "inv_helmet_180v2", "inv_helmet_180v3", "inv_helmet_182v1", "inv_helmet_182v2", "inv_helmet_182v3", "inv_helmet_183v1", "inv_helmet_183v2", "inv_helmet_183v3", "inv_helmet_184v1", "inv_helmet_184v2", "inv_helmet_184v3", "inv_helmet_185v1", "inv_helmet_185v2", "inv_helmet_185v3", "inv_helmet_187v1", "inv_helmet_187v2", "inv_helmet_187v3", "inv_helmet_188v1", "inv_helmet_188v2", "inv_helmet_188v3", "inv_helmet_robe_common_c_01v1", "inv_helmet_robe_common_c_01v2", "inv_helmet_robe_common_c_01v3", "inv_helmet_mail_dungeonmail_c_04", "inv_helm_leather_pvpdruid_c_01", "inv_helmet_leather_raiddruid_i_01", "inv_helmet_leatherraidrogue_i_01", "inv_helmet_leather_cataclysm_b_02", "inv_helmet_cloth_raidwarlock_i_01", "inv_helm_mail_pvphunter_c_01", "inv_helm_plate_pvppaladin_c_01", "inv_helmet_plate_cataclysm_b_02", "inv_helmet_plate_raidwarrior_i_01", "inv_helmet_mail_pvpshaman_c_01", "inv_helm_robe_raidmage_i_01", "inv_helmet_cloth_pvpwarlock_c_01", "inv_helmet_cloth_raidpriest_i_01", "inv_helmet_plate_raidpaladin_i_01", "inv_helm_mail_raidhunter_i_01", "inv_helmet_plate_raiddeathknight_i_01", "inv_helmet_raidshaman_i_01", "inv_helmet_mail_pvphunter_c_02", "inv_helmet_cloth_pvpmage_c_02", "inv_helm_plate_pvppaladin_c_02", "inv_helm_mail_pvpshaman_c_02", "inv_helm_robe_pvppriest_c_02", "inv_helmet_leather_pvprogue_c_02", "inv_helm_leather_pvpdruid_c_02", "inv_helmet_cloth_pvpwarlock_c_02", "inv_helm_plate_pvpdeathknight_c_02", "inv_helmet_plate_raidpaladin_j_01", "inv_helm_leather_firelandsdruid_d_01", "inv_helm_mail_d_01", "inv_helmet_robe_raidpriest_j_01", "inv_helmet_leather_raidrogue_j_01", "inv_helm_mail_raidhunter_j_01", "inv_helm_circlet_firelands_d_01", "inv_helm_plate_raidwarrior_j_01", "inv_helmet_robe_raidmage_j_01", "inv_helmet_plate_raiddeathknight_j_01", "inv_helm_plate_dungeonplate_c_05", "inv_helmet_leather_raiddruid_j_01", "inv_helmet_mail_raidshaman_j_01", "inv_helm_robe_raidwarlock_j_01", "inv_helm_plate_pvpwarrior_d_01", "inv_helmet_robe_pvpwarlock_d_01", "inv_helm_mail_pvphunter_d_01", "inv_helm_robe_pvppriest_d_01", "inv_helm_robe_dungeonrobe_c_05", "inv_helm_plate_pvpdeathknight_d_01", "inv_helmet_robe_pvpmage_d_01", "ability_ambush", "ability_backstab", "ability_bullrush", "ability_cheapshot", "ability_creature_cursed_01", "ability_creature_cursed_02", "ability_creature_cursed_03", "ability_creature_cursed_04", "ability_creature_cursed_05", "ability_creature_disease_01", "ability_creature_disease_02", "ability_creature_disease_03", "ability_creature_disease_04", "ability_creature_disease_05", "ability_creature_poison_01", "ability_creature_poison_02", "ability_creature_poison_03", "ability_creature_poison_04", "ability_creature_poison_05", "ability_creature_poison_06", "ability_criticalstrike", "ability_defend", "ability_devour", "ability_druid_aquaticform", "ability_druid_balanceofpower", "ability_druid_bash", "ability_druid_catform", "ability_druid_catformattack", "ability_druid_challangingroar", "ability_druid_cower", "ability_druid_cyclone", "ability_druid_dash", "ability_druid_demoralizingroar", "ability_druid_disembowel", "ability_druid_dreamstate", "ability_druid_empoweredrejuvination", "ability_druid_empoweredtouch", "ability_druid_enrage", "ability_druid_ferociousbite", "ability_druid_flightform", "ability_druid_forceofnature", "ability_druid_healinginstincts", "ability_druid_lacerate", "ability_druid_lunarguidance", "ability_druid_mangle", "ability_druid_mangle2", "ability_druid_maul", "ability_druid_naturalperfection", "ability_druid_predatoryinstincts", "ability_druid_primaltenacity", "ability_druid_rake", "ability_druid_ravage", "ability_druid_supriseattack", "ability_druid_swipe", "ability_druid_travelform", "ability_druid_treeoflife", "ability_druid_twilightswrath", "ability_dualwield", "ability_dualwieldspecialization", "ability_ensnare", "ability_eyeoftheowl", "ability_fiegndead", "ability_ghoulfrenzy", "ability_golemstormbolt", "ability_golemthunderclap", "ability_gouge", "ability_hibernation", "ability_hunter_aimedshot", "ability_hunter_animalhandler", "ability_hunter_aspectofthemonkey", "ability_hunter_aspectoftheviper", "ability_hunter_beastcall", "ability_hunter_beastcall02", "ability_hunter_beastsoothe", "ability_hunter_beasttaming", "ability_hunter_beasttraining", "ability_hunter_beastwithin", "ability_hunter_catlikereflexes", "ability_hunter_combatexperience", "ability_hunter_criticalshot", "ability_hunter_disarmingshot", "ability_hunter_displacement", "ability_hunter_eagleeye", "ability_hunter_ferociousinspiration", "ability_hunter_goforthethroat", "ability_hunter_harass", "ability_hunter_killcommand", "ability_hunter_mastermarksman", "ability_hunter_mastertactitian", "ability_hunter_mendpet", "ability_hunter_misdirection", "ability_hunter_pathfinding", "ability_hunter_pet_bat", "ability_hunter_pet_bear", "ability_hunter_pet_boar", "ability_hunter_pet_cat", "ability_hunter_pet_crab", "ability_hunter_pet_crocolisk", "ability_hunter_pet_dragonhawk", "ability_hunter_pet_gorilla", "ability_hunter_pet_hyena", "ability_hunter_pet_netherray", "ability_hunter_pet_owl", "ability_hunter_pet_raptor", "ability_hunter_pet_ravager", "ability_hunter_pet_scorpid", "ability_hunter_pet_spider", "ability_hunter_pet_sporebat", "ability_hunter_pet_tallstrider", "ability_hunter_pet_turtle", "ability_hunter_pet_vulture", "ability_hunter_pet_warpstalker", "ability_hunter_pet_windserpent", "ability_hunter_pet_wolf", "ability_hunter_quickshot", "ability_hunter_rapidkilling", "ability_hunter_readiness", "ability_hunter_resourcefulness", "ability_hunter_runningshot", "ability_hunter_serpentswiftness", "ability_hunter_silenthunter", "ability_hunter_snaketrap", "ability_hunter_snipershot", "ability_hunter_steadyshot", "ability_hunter_survivalinstincts", "ability_hunter_swiftstrike", "ability_hunter_thrillofthehunt", "ability_hunter_zenarchery", "ability_impalingbolt", "ability_kick", "ability_mage_invisibility", "ability_mage_moltenarmor", "ability_marksmanship", "ability_meleedamage", "ability_mount_blackdirewolf", "ability_mount_blackpanther", "ability_mount_charger", "ability_mount_cockatricemount", "ability_mount_cockatricemount_black", "ability_mount_cockatricemount_blue", "ability_mount_cockatricemount_green", "ability_mount_cockatricemount_purple", "ability_mount_cockatricemountelite", "ability_mount_cockatricemountelite_black", "ability_mount_cockatricemountelite_blue", "ability_mount_cockatricemountelite_green", "ability_mount_cockatricemountelite_purple", "ability_mount_cockatricemountelite_white", "ability_mount_dreadsteed", "ability_mount_gryphon_01", "ability_mount_gyrocoptor", "ability_mount_gyrocoptorelite", "ability_mount_jungletiger", "ability_mount_kodo_01", "ability_mount_kodo_02", "ability_mount_kodo_03", "ability_mount_kotobrewfest", "ability_mount_mechastrider", "ability_mount_mountainram", "ability_mount_netherdrakeelite", "ability_mount_netherdrakepurple", "ability_mount_nightmarehorse", "ability_mount_pinktiger", "ability_mount_raptor", "ability_mount_ridingelekk", "ability_mount_ridingelekk_grey", "ability_mount_ridingelekk_purple", "ability_mount_ridingelekkelite", "ability_mount_ridingelekkelite_blue", "ability_mount_ridingelekkelite_green", "ability_mount_ridingelekkelite_purple", "ability_mount_ridinghorse", "ability_mount_rocketmount", "ability_mount_rocketmountblue", "ability_mount_undeadhorse", "ability_mount_warhippogryph", "ability_mount_whitedirewolf", "ability_mount_whitetiger", "ability_mount_wyvern_01", "ability_parry", "ability_physical_taunt", "ability_piercedamage", "ability_poisonarrow", "ability_poisons", "ability_poisonsting", "ability_racial_avatar", "ability_racial_bearform", "ability_racial_bloodrage", "ability_racial_cannibalize", "ability_racial_shadowmeld", "ability_racial_ultravision", "ability_repair", "ability_rogue_ambush", "ability_rogue_bladetwisting", "ability_rogue_bloodyeye", "ability_rogue_cheatdeath", "ability_rogue_deadenednerves", "ability_rogue_disembowel", "ability_rogue_disguise", "ability_rogue_distract", "ability_rogue_dualweild", "ability_rogue_envelopingshadows", "ability_rogue_eviscerate", "ability_rogue_feigndeath", "ability_rogue_feint", "ability_rogue_findweakness", "ability_rogue_fleetfooted", "ability_rogue_garrote", "ability_rogue_kidneyshot", "ability_rogue_masterofsubtlety", "ability_rogue_nervesofsteel", "ability_rogue_quickrecovery", "ability_rogue_rupture", "ability_rogue_shadowstep", "ability_rogue_shadowstrikes", "ability_rogue_sinistercalling", "ability_rogue_slicedice", "ability_rogue_sprint", "ability_rogue_surpriseattack", "ability_rogue_trip", "ability_sap", "ability_seal", "ability_searingarrow", "ability_shaman_heroism", "ability_shaman_stormstrike", "ability_shaman_watershield", "ability_shockwave", "ability_shootwand", "ability_smash", "ability_spy", "ability_stealth", "ability_steelmelee", "ability_suffocate", "ability_theblackarrow", "ability_throw", "ability_thunderbolt", "ability_thunderclap", "ability_townwatch", "ability_tracking", "ability_trueshot", "ability_upgrademoonglaive", "ability_vanish", "ability_warlock_avoidance", "ability_warrior_battleshout", "ability_warrior_bloodfrenzy", "ability_warrior_bullrush", "ability_warrior_challange", "ability_warrior_charge", "ability_warrior_cleave", "ability_warrior_commandingshout", "ability_warrior_decisivestrike", "ability_warrior_defensivestance", "ability_warrior_devastate", "ability_warrior_disarm", "ability_warrior_endlessrage", "ability_warrior_focusedrage", "ability_warrior_improveddisciplines", "ability_warrior_innerrage", "ability_warrior_intervene", "ability_warrior_offensivestance", "ability_warrior_punishingblow", "ability_warrior_rallyingcry", "ability_warrior_rampage", "ability_warrior_revenge", "ability_warrior_riposte", "ability_warrior_savageblow", "ability_warrior_secondwind", "ability_warrior_shieldbash", "ability_warrior_shieldbreak", "ability_warrior_shieldguard", "ability_warrior_shieldmastery", "ability_warrior_shieldreflection", "ability_warrior_shieldwall", "ability_warrior_sunder", "ability_warrior_trauma", "ability_warrior_victoryrush", "ability_warrior_warcry", "ability_warrior_weaponmastery", "ability_warstomp", "ability_whirlwind", "ability_druid_berserk", "ability_druid_earthandsky", "ability_druid_eclipse", "ability_druid_eclipseorange", "ability_druid_flourish", "ability_druid_galewinds", "ability_druid_giftoftheearthmother", "ability_druid_improvedmoonkinform", "ability_druid_improvedtreeform", "ability_druid_infectedwound", "ability_druid_kingofthejungle", "ability_druid_manatree", "ability_druid_mastershapeshifter", "ability_druid_nourish", "ability_druid_owlkinfrenzy", "ability_druid_primalagression", "ability_druid_primalprecision", "ability_druid_replenish", "ability_druid_skinteeth", "ability_druid_starfall", "ability_druid_tigersroar", "ability_druid_typhoon", "ability_heroicleap", "ability_hunter_aspectmastery", "ability_hunter_assassinate", "ability_hunter_assassinate2", "ability_hunter_beastmastery", "ability_hunter_chimerashot2", "ability_hunter_cobrastrikes", "ability_hunter_explosiveshot", "ability_hunter_focusedaim", "ability_hunter_huntervswild", "ability_hunter_huntingparty", "ability_hunter_improvedsteadyshot", "ability_hunter_improvedtracking", "ability_hunter_invigeration", "ability_hunter_lockandload", "ability_hunter_longevity", "ability_hunter_longshots", "ability_hunter_markedfordeath", "ability_hunter_masterscall", "ability_hunter_pet_chimera", "ability_hunter_pet_corehound", "ability_hunter_pet_devilsaur", "ability_hunter_pet_moth", "ability_hunter_pet_rhino", "ability_hunter_pet_silithid", "ability_hunter_pet_wasp", "ability_hunter_pet_worm", "ability_hunter_piercingshots", "ability_hunter_pointofnoescape", "ability_hunter_potentvenom", "ability_hunter_rapidregeneration", "ability_hunter_separationanxiety", "ability_hunter_snipertraining", "ability_hunter_wildquiver", "ability_mage_arcanebarrage", "ability_mage_brainfreeze", "ability_mage_burnout", "ability_mage_chilledtothebone", "ability_mage_coldasice", "ability_mage_conjurefoodrank10", "ability_mage_conjurefoodrank12", "ability_mage_conjurefoodrank9", "ability_mage_conjurewater11", "ability_mage_deepfreeze", "ability_mage_fierypayback", "ability_mage_firestarter", "ability_mage_frostfirebolt", "ability_mage_hotstreak", "ability_mage_incantersabsorbtion", "ability_mage_livingbomb", "ability_mage_missilebarrage", "ability_mage_netherwindpresence", "ability_mage_potentspirit", "ability_mage_shattershield", "ability_mage_studentofthemind", "ability_mage_tormentoftheweak", "ability_mage_wintersgrasp", "ability_mage_worldinflames", "ability_miling", "ability_mount_drake_azure", "ability_mount_drake_blue", "ability_mount_drake_bronze", "ability_mount_drake_proto", "ability_mount_drake_red", "ability_mount_drake_twilight", "ability_mount_flyingcarpet", "ability_mount_mammoth_black", "ability_mount_mammoth_black_3seater", "ability_mount_mammoth_brown", "ability_mount_mammoth_brown_3seater", "ability_mount_mammoth_white", "ability_mount_mammoth_white_3seater", "ability_mount_polarbear_black", "ability_mount_polarbear_brown", "ability_mount_polarbear_white", "ability_paladin_artofwar", "ability_paladin_beaconoflight", "ability_paladin_blessedhands", "ability_paladin_blessedmending", "ability_paladin_divinestorm", "ability_paladin_enlightenedjudgements", "ability_paladin_gaurdedbythelight", "ability_paladin_hammeroftherighteous", "ability_paladin_infusionoflight", "ability_paladin_judgementblue", "ability_paladin_judgementofthepure", "ability_paladin_judgementofthewise", "ability_paladin_judgementred", "ability_paladin_judgementsofthejust", "ability_paladin_righteousvengeance", "ability_paladin_sacredcleansing", "ability_paladin_sanctifiedwrath", "ability_paladin_sheathoflight", "ability_paladin_shieldofthetemplar", "ability_paladin_shieldofvengeance", "ability_paladin_swiftretribution", "ability_paladin_touchedbylight", "ability_rogue_bloodsplatter", "spell_arcane_arcane01", "spell_arcane_arcane02", "spell_arcane_arcane03", "spell_arcane_arcane04", "spell_arcane_arcanepotency", "spell_arcane_arcaneresilience", "spell_arcane_arcanetorrent", "spell_arcane_blast", "spell_arcane_blink", "spell_arcane_focusedpower", "spell_arcane_manatap", "spell_arcane_massdispel", "spell_arcane_mindmastery", "spell_arcane_portaldarnassus", "spell_arcane_portalexodar", "spell_arcane_portalironforge", "spell_arcane_portalorgrimmar", "spell_arcane_portalshattrath", "spell_arcane_portalsilvermoon", "spell_arcane_portalstonard", "spell_arcane_portalstormwind", "spell_arcane_portaltheramore", "spell_arcane_portalthunderbluff", "spell_arcane_portalundercity", "spell_arcane_prismaticcloak", "spell_arcane_starfire", "spell_arcane_studentofmagic", "spell_arcane_teleportdarnassus", "spell_arcane_teleportexodar", "spell_arcane_teleportironforge", "spell_arcane_teleportmoonglade", "spell_arcane_teleportorgrimmar", "spell_arcane_teleportshattrath", "spell_arcane_teleportsilvermoon", "spell_arcane_teleportstonard", "spell_arcane_teleportstormwind", "spell_arcane_teleporttheramore", "spell_arcane_teleportthunderbluff", "spell_arcane_teleportundercity", "spell_brokenheart", "spell_chargenegative", "spell_chargepositive", "spell_deathknight_bloodpresence", "spell_deathknight_classicon", "spell_deathknight_deathstrike", "spell_deathknight_frostpresence", "spell_deathknight_plaguestrike", "spell_deathknight_unholypresence", "spell_fire_bluecano", "spell_fire_bluefire", "spell_fire_bluefirenova", "spell_fire_bluefireward", "spell_fire_blueflamebolt", "spell_fire_blueflamebreath", "spell_fire_blueflamering", "spell_fire_blueflamestrike", "spell_fire_bluehellfire", "spell_fire_blueimmolation", "spell_fire_bluepyroblast", "spell_fire_bluerainoffire", "spell_fire_burningspeed", "spell_fire_burnout", "spell_fire_elemental_totem", "spell_fire_elementaldevastation", "spell_fire_enchantweapon", "spell_fire_felcano", "spell_fire_felfire", "spell_fire_felfirenova", "spell_fire_felfireward", "spell_fire_felflamebolt", "spell_fire_felflamebreath", "spell_fire_felflamering", "spell_fire_felflamestrike", "spell_fire_felhellfire", "spell_fire_felimmolation", "spell_fire_felpyroblast", "spell_fire_felrainoffire", "spell_fire_fire", "spell_fire_firearmor", "spell_fire_fireball", "spell_fire_fireball02", "spell_fire_firebolt", "spell_fire_firebolt02", "spell_fire_flameblades", "spell_fire_flamebolt", "spell_fire_flameshock", "spell_fire_flametounge", "spell_fire_flare", "spell_fire_frostresistancetotem", "spell_fire_immolation", "spell_fire_incinerate", "spell_fire_lavaspawn", "spell_fire_masterofelements", "spell_fire_meteorstorm", "spell_fire_moltenblood", "spell_fire_playingwithfire", "spell_fire_sealoffire", "spell_fire_searingtotem", "spell_fire_selfdestruct", "spell_fire_soulburn", "spell_fire_sunkey", "spell_fire_totemofwrath", "spell_fire_volcano", "spell_fire_windsofwoe", "spell_fireresistancetotem_01", "spell_frost_arcticwinds", "spell_frost_chainsofice", "spell_frost_chillingarmor", "spell_frost_chillingblast", "spell_frost_chillingbolt", "spell_frost_coldhearted", "spell_frost_fireresistancetotem", "spell_frost_freezingbreath", "spell_frost_frost", "spell_frost_frostarmor", "spell_frost_frostarmor02", "spell_frost_frostblast", "spell_frost_frostbolt", "spell_frost_frostbolt02", "spell_frost_frostbrand", "spell_frost_frostnova", "spell_frost_frostshock", "spell_frost_frostward", "spell_frost_frozencore", "spell_frost_glacier", "spell_frost_iceclaw", "spell_frost_icefloes", "spell_frost_iceshard", "spell_frost_iceshock", "spell_frost_icestorm", "spell_frost_manaburn", "spell_frost_manarecharge", "spell_frost_stun", "spell_frost_summonwaterelemental", "spell_frost_summonwaterelemental_2", "spell_frost_windwalkon", "spell_frost_wisp", "spell_frost_wizardmark", "spell_frostresistancetotem_01", "spell_holiday_tow_spicecloud", "spell_holy_absolution", "spell_holy_arcaneintellect", "spell_holy_ardentdefender", "spell_holy_ashestoashes", "spell_holy_auramastery", "spell_holy_auraoflight", "spell_holy_avengersshield", "spell_holy_avenginewrath", "spell_holy_blessedlife", "spell_holy_blessedrecovery", "spell_holy_blessedresillience", "spell_holy_blessingofagility", "spell_holy_blessingofprotection", "spell_holy_blessingofstamina", "spell_holy_blessingofstrength", "spell_holy_blindingheal", "spell_holy_championsbond", "spell_holy_chastise", "spell_holy_circleofrenewal", "spell_holy_consumemagic", "spell_holy_crusade", "spell_holy_crusaderaura", "spell_holy_crusaderstrike", "spell_holy_devotion", "spell_holy_devotionaura", "spell_holy_dispelmagic", "spell_holy_divineillumination", "spell_holy_divineintervention", "spell_holy_divinepurpose", "spell_holy_divinespirit", "spell_holy_dizzy", "spell_holy_empowerchampion", "spell_holy_excorcism", "spell_holy_excorcism_02", "spell_holy_eyeforaneye", "spell_holy_fanaticism", "spell_holy_fistofjustice", "spell_holy_flashheal", "spell_holy_greaterblessingofkings", "spell_holy_greaterblessingoflight", "spell_holy_greaterblessingofsalvation", "spell_holy_greaterblessingofsanctuary", "spell_holy_greaterblessingofwisdom", "spell_holy_greaterheal", "spell_holy_harmundeadaura", "spell_holy_heal", "spell_holy_heal02", "spell_holy_healingaura", "spell_holy_healingfocus", "spell_holy_heroism", "spell_holy_holybolt", "spell_holy_holyguidance", "spell_holy_holynova", "spell_holy_holyprotection", "spell_holy_holysmite", "spell_holy_improvedresistanceauras", "spell_holy_innerfire", "spell_holy_lastingdefense", "spell_holy_layonhands", "spell_holy_lesserheal", "spell_holy_lesserheal02", "spell_holy_magicalsentry", "spell_holy_mindsooth", "spell_holy_mindvision", "spell_holy_nullifydisease", "spell_holy_painsupression", "spell_holy_persuitofjustice", "spell_holy_power", "spell_holy_powerinfusion", "spell_holy_powerwordshield", "spell_holy_prayeroffortitude", "spell_holy_prayerofhealing", "spell_holy_prayerofhealing02", "spell_holy_prayerofmendingtga", "spell_holy_prayerofshadowprotection", "spell_holy_prayerofspirit", "spell_holy_proclaimchampion", "spell_holy_pureofheart", "spell_holy_purify", "spell_holy_purifyingpower", "spell_holy_redemption", "spell_holy_removecurse", "spell_holy_renew", "spell_holy_restoration", "spell_holy_resurrection", "spell_holy_retribution", "spell_holy_retributionaura", "spell_holy_revivechampion", "spell_holy_righteousfury", "spell_holy_righteousnessaura", "spell_holy_sealofblood", "spell_holy_sealoffury", "spell_holy_sealofmight", "spell_holy_sealofprotection", "spell_holy_sealofrighteousness", "spell_holy_sealofsacrifice", "spell_holy_sealofsalvation", "spell_holy_sealofvalor", "spell_holy_sealofvengeance", "spell_holy_sealofwisdom", "spell_holy_sealofwrath", "spell_holy_searinglight", "spell_holy_searinglightpriest", "spell_holy_senseundead", "spell_holy_silence", "spell_holy_spellwarding", "spell_holy_spiritualguidence", "spell_holy_stoicism", "spell_holy_summonchampion", "spell_holy_summonlightwell", "spell_holy_surgeoflight", "spell_holy_symbolofhope", "spell_holy_turnundead", "spell_holy_unyieldingfaith", "spell_holy_vindication", "spell_holy_weaponmastery", "spell_holy_wordfortitude", "spell_ice_lament", "spell_ice_magicdamage", "spell_lightning_lightningbolt01", "spell_magearmor", "spell_magic_featherfall", "spell_magic_greaterblessingofkings", "spell_magic_lesserinvisibilty", "spell_magic_magearmor", "spell_magic_polymorphchicken", "spell_magic_polymorphpig", "spell_misc_conjuremanajewel", "spell_misc_drink", "spell_misc_food", "spell_misc_hellifrepvpcombatmorale", "spell_misc_hellifrepvphonorholdfavor", "spell_misc_hellifrepvpthrallmarfavor", "spell_misc_warsongbrutal", "spell_misc_warsongfocus", "spell_nature_abolishmagic", "spell_nature_acid_01", "spell_nature_agitatingtotem", "spell_nature_ancestralguardian", "spell_nature_astralrecal", "spell_nature_astralrecalgroup", "spell_nature_bloodlust", "spell_nature_brilliance", "spell_nature_callstorm", "spell_nature_chainlightning", "spell_nature_corrosivebreath", "spell_nature_crystalball", "spell_nature_cyclone", "spell_nature_diseasecleansingtotem", "spell_nature_drowsy", "spell_nature_dryaddispelmagic", "spell_nature_earthbind", "spell_nature_earthbindtotem", "spell_nature_earthelemental_totem", "spell_nature_earthquake", "spell_nature_earthshock", "spell_nature_elementalabsorption", "spell_nature_elementalprecision_1", "spell_nature_elementalprecision_2", "spell_nature_elementalshields", "spell_nature_enchantarmor", "spell_nature_eyeofthestorm", "spell_nature_faeriefire", "spell_nature_farsight", "spell_nature_focusedmind", "spell_nature_forceofnature", "spell_nature_giftofthewaterspirit", "spell_nature_giftofthewild", "spell_nature_groundingtotem", "spell_nature_guardianward", "spell_nature_healingtouch", "spell_nature_healingwavegreater", "spell_nature_healingwavelesser", "spell_nature_healingway", "spell_nature_insectswarm", "spell_nature_invisibilitytotem", "spell_nature_invisibilty", "spell_nature_lightning", "spell_nature_lightningbolt", "spell_nature_lightningoverload", "spell_nature_lightningshield", "spell_nature_magicimmunity", "spell_nature_manaregentotem", "spell_nature_massteleport", "spell_nature_mentalquickness", "spell_nature_mirrorimage", "spell_nature_moonglow", "spell_nature_moonkey", "spell_nature_natureblessing", "spell_nature_natureguardian", "spell_nature_natureresistancetotem", "spell_nature_naturesblessing", "spell_nature_natureswrath", "spell_nature_naturetouchdecay", "spell_nature_naturetouchgrow", "spell_nature_nullifydisease", "spell_nature_nullifypoison", "spell_nature_nullifypoison_02", "spell_nature_nullward", "spell_nature_poisoncleansingtotem", "spell_nature_polymorph", "spell_nature_polymorph_cow", "spell_nature_preservation", "spell_nature_protectionformnature", "spell_nature_purge", "spell_nature_ravenform", "spell_nature_regenerate", "spell_nature_regeneration", "spell_nature_regeneration_02", "spell_nature_reincarnation", "spell_nature_rejuvenation", "spell_nature_removecurse", "spell_nature_removedisease", "spell_nature_resistmagic", "spell_nature_resistnature", "spell_nature_rockbiter", "spell_nature_sentinal", "spell_nature_shamanrage", "spell_nature_skinofearth", "spell_nature_sleep", "spell_nature_slow", "spell_nature_slowingtotem", "spell_nature_slowpoison", "spell_nature_spiritarmor", "spell_nature_spiritwolf", "spell_nature_starfall", "spell_nature_stoneclawtotem", "spell_nature_stoneskintotem", "spell_nature_stormreach", "spell_nature_stranglevines", "spell_nature_strength", "spell_nature_strengthofearthtotem02", "spell_nature_swiftness", "spell_nature_thorns", "spell_nature_thunderclap", "spell_nature_timestop", "spell_nature_tranquility", "spell_nature_tremortotem", "spell_nature_undyingstrength", "spell_nature_unleashedrage", "spell_nature_unrelentingstorm", "spell_nature_unyeildingstamina", "spell_nature_web", "spell_nature_windfury", "spell_nature_wispheal", "spell_nature_wispsplode", "spell_shadow_abominationexplosion", "spell_shadow_animatedead", "spell_shadow_antimagicshell", "spell_shadow_antishadow", "spell_shadow_auraofdarkness", "spell_shadow_blackplague", "spell_shadow_bloodboil", "spell_shadow_brainwash", "spell_shadow_burningspirit", "spell_shadow_callofbone", "spell_shadow_carrionswarm", "inv_misc_ahnqirajtrinket_01", "inv_misc_ahnqirajtrinket_02", "inv_misc_ahnqirajtrinket_03", "inv_misc_ahnqirajtrinket_04", "inv_misc_ahnqirajtrinket_05", "inv_misc_ahnqirajtrinket_06", "inv_misc_ammo_arrow_01", "inv_misc_ammo_arrow_02", "inv_misc_ammo_arrow_03", "inv_misc_ammo_arrow_04", "inv_misc_ammo_arrow_05", "inv_misc_ammo_bullet_01", "inv_misc_ammo_bullet_02", "inv_misc_ammo_bullet_03", "inv_misc_ammo_bullet_04", "inv_misc_ammo_bullet_05", "inv_misc_ammo_bullet_06", "inv_misc_ammo_gunpowder_01", "inv_misc_ammo_gunpowder_02", "inv_misc_ammo_gunpowder_03", "inv_misc_ammo_gunpowder_04", "inv_misc_ammo_gunpowder_05", "inv_misc_ammo_gunpowder_06", "inv_misc_ammo_gunpowder_07", "inv_misc_apexis_crystal", "inv_misc_apexis_shard", "inv_misc_armorkit_01", "inv_misc_armorkit_02", "inv_misc_armorkit_03", "inv_misc_armorkit_04", "inv_misc_armorkit_05", "inv_misc_armorkit_06", "inv_misc_armorkit_07", "inv_misc_armorkit_08", "inv_misc_armorkit_09", "inv_misc_armorkit_10", "inv_misc_armorkit_11", "inv_misc_armorkit_12", "inv_misc_armorkit_14", "inv_misc_armorkit_15", "inv_misc_armorkit_16", "inv_misc_armorkit_17", "inv_misc_armorkit_18", "inv_misc_armorkit_19", "inv_misc_armorkit_20", "inv_misc_armorkit_21", "inv_misc_armorkit_22", "inv_misc_armorkit_23", "inv_misc_armorkit_24", "inv_misc_armorkit_25", "inv_misc_armorkit_26", "inv_misc_armorkit_27", "inv_misc_bag_01", "inv_misc_bag_02", "inv_misc_bag_03", "inv_misc_bag_04", "inv_misc_bag_05", "inv_misc_bag_06", "inv_misc_bag_07", "inv_misc_bag_07_black", "inv_misc_bag_07_blue", "inv_misc_bag_07_green", "inv_misc_bag_07_red", "inv_misc_bag_08", "inv_misc_bag_09", "inv_misc_bag_09_black", "inv_misc_bag_09_blue", "inv_misc_bag_09_green", "inv_misc_bag_09_red", "inv_misc_bag_10", "inv_misc_bag_10_black", "inv_misc_bag_10_blue", "inv_misc_bag_10_green", "inv_misc_bag_10_red", "inv_misc_bag_11", "inv_misc_bag_12", "inv_misc_bag_13", "inv_misc_bag_14", "inv_misc_bag_15", "inv_misc_bag_16", "inv_misc_bag_17", "inv_misc_bag_18", "inv_misc_bag_19", "inv_misc_bag_20", "inv_misc_bag_21", "inv_misc_bag_22", "inv_misc_bag_23_netherweave", "inv_misc_bag_24_netherweave_imbued", "inv_misc_bag_25_mooncloth", "inv_misc_bag_26_spellfire", "inv_misc_bag_27", "inv_misc_bag_28_halloween", "inv_misc_bag_bigbagofenchantments", "inv_misc_bag_cenarionherbbag", "inv_misc_bag_corefelclothbag", "inv_misc_bag_enchantedmageweave", "inv_misc_bag_enchantedrunecloth", "inv_misc_bag_felclothbag", "inv_misc_bag_herbpouch", "inv_misc_bag_satchelofcenarius", "inv_misc_bag_soulbag", "inv_misc_bandage_01", "inv_misc_bandage_02", "inv_misc_bandage_03", "inv_misc_bandage_04", "inv_misc_bandage_05", "inv_misc_bandage_06", "inv_misc_bandage_07", "inv_misc_bandage_08", "inv_misc_bandage_09", "inv_misc_bandage_10", "inv_misc_bandage_11", "inv_misc_bandage_12", "inv_misc_bandage_13", "inv_misc_bandage_14", "inv_misc_bandage_15", "inv_misc_bandage_16", "inv_misc_bandage_17", "inv_misc_bandage_18", "inv_misc_bandage_19", "inv_misc_bandage_20", "inv_misc_bandage_netherweave", "inv_misc_bandage_netherweave_heavy", "inv_misc_bandana_01", "inv_misc_bandana_03", "inv_misc_basket_01", "inv_misc_beer_01", "inv_misc_beer_02", "inv_misc_beer_03", "inv_misc_beer_04", "inv_misc_beer_05", "inv_misc_beer_06", "inv_misc_beer_07", "inv_misc_beer_08", "inv_misc_beer_09", "inv_misc_beer_10", "inv_misc_bell_01", "inv_misc_birdbeck_01", "inv_misc_birdbeck_02", "inv_misc_bomb_01", "inv_misc_bomb_02", "inv_misc_bomb_03", "inv_misc_bomb_04", "inv_misc_bomb_05", "inv_misc_bomb_06", "inv_misc_bomb_07", "inv_misc_bomb_08", "inv_misc_bomb_09", "inv_misc_bone_01", "inv_misc_bone_02", "inv_misc_bone_03", "inv_misc_bone_04", "inv_misc_bone_05", "inv_misc_bone_06", "inv_misc_bone_07", "inv_misc_bone_08", "inv_misc_bone_09", "inv_misc_bone_10", "inv_misc_bone_dwarfskull_01", "inv_misc_bone_elfskull_01", "inv_misc_bone_humanskull_01", "inv_misc_bone_orcskull_01", "inv_misc_bone_taurenskull_01", "inv_misc_book_01", "inv_misc_book_02", "inv_misc_book_03", "inv_misc_book_04", "inv_misc_book_05", "inv_misc_book_06", "inv_misc_book_07", "inv_misc_book_08", "inv_misc_book_09", "inv_misc_book_10", "inv_misc_book_11", "inv_misc_book_12", "inv_misc_book_13", "inv_misc_book_14", "inv_misc_book_15", "inv_misc_bowl_01", "inv_misc_branch_01", "inv_misc_candle_01", "inv_misc_candle_02", "inv_misc_candle_03", "inv_misc_cape_01", "inv_misc_cape_02", "inv_misc_cape_03", "inv_misc_cape_04", "inv_misc_cape_05", "inv_misc_cape_06", "inv_misc_cape_07", "inv_misc_cape_08", "inv_misc_cape_09", "inv_misc_cape_10", "inv_misc_cape_11", "inv_misc_cape_12", "inv_misc_cape_13", "inv_misc_cape_14", "inv_misc_cape_15", "inv_misc_cape_16", "inv_misc_cape_17", "inv_misc_cape_18", "inv_misc_cape_19", "inv_misc_cape_20", "inv_misc_cape_21", "inv_misc_cape_22", "inv_misc_cape_naxxramas_01", "inv_misc_cape_naxxramas_02", "inv_misc_cape_naxxramas_03", "inv_misc_cauldron_arcane", "inv_misc_cauldron_fire", "inv_misc_cauldron_frost", "inv_misc_cauldron_nature", "inv_misc_cauldron_shadow", "inv_misc_celebrationcake_01", "inv_misc_coin_01", "inv_misc_coin_02", "inv_misc_coin_03", "inv_misc_coin_04", "inv_misc_coin_05", "inv_misc_coin_06", "inv_misc_coin_07", "inv_misc_coin_08", "inv_misc_coin_09", "inv_misc_coin_10", "inv_misc_coin_11", "inv_misc_coin_12", "inv_misc_coin_13", "inv_misc_coin_14", "inv_misc_coin_15", "inv_misc_coin_16", "inv_misc_comb_01", "inv_misc_comb_02", "inv_misc_crop_01", "inv_misc_crop_02", "inv_misc_desecrated_clothbelt", "inv_misc_desecrated_clothboots", "inv_misc_desecrated_clothbracer", "inv_misc_desecrated_clothchest", "inv_misc_desecrated_clothglove", "inv_misc_desecrated_clothhelm", "inv_misc_desecrated_clothpants", "inv_misc_desecrated_clothshoulder", "inv_misc_desecrated_leatherbelt", "inv_misc_desecrated_leatherboots", "inv_misc_desecrated_leatherbracer", "inv_misc_desecrated_leatherchest", "inv_misc_desecrated_leatherglove", "inv_misc_desecrated_leatherhelm", "inv_misc_desecrated_leatherpants", "inv_misc_desecrated_leathershoulder", "inv_misc_desecrated_mailbelt", "inv_misc_desecrated_mailboots", "inv_misc_desecrated_mailbracer", "inv_misc_desecrated_mailchest", "inv_misc_desecrated_mailglove", "inv_misc_desecrated_mailhelm", "inv_misc_desecrated_mailpants", "inv_misc_desecrated_mailshoulder", "inv_misc_desecrated_platebelt", "inv_misc_desecrated_plateboots", "inv_misc_desecrated_platebracer", "inv_misc_desecrated_platechest", "inv_misc_desecrated_plategloves", "inv_misc_desecrated_platehelm", "inv_misc_desecrated_platepants", "inv_misc_desecrated_plateshoulder", "inv_misc_discoball_01", "inv_misc_dragonkite_01", "inv_misc_dragonkite_02", "inv_misc_dragonkite_03", "inv_misc_dragonkite_04", "inv_misc_drum_01", "inv_misc_drum_02", "inv_misc_drum_03", "inv_misc_drum_04", "inv_misc_drum_05", "inv_misc_drum_06", "inv_misc_drum_07", "inv_misc_dust_01", "inv_misc_dust_02", "inv_misc_dust_03", "inv_misc_dust_04", "inv_misc_dust_05", "inv_misc_dust_06", "inv_misc_ear_human_01", "inv_misc_ear_human_02", "inv_misc_ear_nightelf_01", "inv_misc_ear_nightelf_02", "inv_misc_elvencoins", "inv_misc_enggizmos_01", "inv_misc_enggizmos_02", "inv_misc_enggizmos_03", "inv_misc_enggizmos_04", "inv_misc_enggizmos_05", "inv_misc_enggizmos_06", "inv_misc_enggizmos_07", "inv_misc_enggizmos_08", "inv_misc_enggizmos_09", "inv_misc_enggizmos_10", "inv_misc_enggizmos_11", "inv_misc_enggizmos_12", "inv_misc_enggizmos_13", "inv_misc_enggizmos_14", "inv_misc_enggizmos_15", "inv_misc_enggizmos_16", "inv_misc_enggizmos_17", "inv_misc_enggizmos_18", "inv_misc_enggizmos_19", "inv_misc_enggizmos_20", "inv_misc_enggizmos_21", "inv_misc_enggizmos_23", "inv_misc_enggizmos_24", "inv_misc_enggizmos_essencedistiller", "inv_misc_enggizmos_rocketchicken", "inv_misc_eye_01", "inv_misc_film_01", "inv_misc_firedancer_01", "inv_misc_fish_01", "inv_misc_fish_02", "inv_misc_fish_03", "inv_misc_fish_04", "inv_misc_fish_05", "inv_misc_fish_06", "inv_misc_fish_07", "inv_misc_fish_08", "inv_misc_fish_09", "inv_misc_fish_10", "inv_misc_fish_11", "inv_misc_fish_12", "inv_misc_fish_13", "inv_misc_fish_14", "inv_misc_fish_15", "inv_misc_fish_16", "inv_misc_fish_17", "inv_misc_fish_18", "inv_misc_fish_19", "inv_misc_fish_20", "inv_misc_fish_21", "inv_misc_fish_22", "inv_misc_fish_23", "inv_misc_fish_24", "inv_misc_fish_25", "inv_misc_fish_26", "inv_misc_fish_27", "inv_misc_fish_28", "inv_misc_fish_29", "inv_misc_fish_30", "inv_misc_fish_31", "inv_misc_fish_32", "inv_misc_fish_33", "inv_misc_fish_34", "inv_misc_fish_35", "inv_misc_fish_36", "inv_misc_fish_37", "inv_misc_fish_38", "inv_misc_fish_39", "inv_misc_fish_40", "inv_misc_fish_41", "inv_misc_fish_42", "inv_misc_fish_43", "inv_misc_fish_44", "inv_misc_fish_45", "inv_misc_fish_46", "inv_misc_fish_47", "inv_misc_fish_48", "inv_misc_fish_turtle_01", "inv_misc_fish_turtle_02", "inv_misc_fish_turtle_03", "inv_misc_flower_01", "inv_misc_flower_02", "inv_misc_flower_03", "inv_misc_flower_04", "inv_misc_flute_01", "inv_misc_food_01", "inv_misc_food_02", "inv_misc_food_03", "inv_misc_food_04", "inv_misc_food_05", "inv_misc_food_06", "inv_misc_food_07", "inv_misc_food_08", "inv_misc_food_09", "inv_misc_food_10", "inv_misc_food_100", "inv_misc_food_100_hardcheese", "inv_misc_food_101_sourcheese", "inv_misc_food_102_flatbread", "inv_misc_food_103_potatobread", "inv_misc_food_104_tundraberries", "inv_misc_food_105_snowplum", "inv_misc_food_106_fjordpeach", "inv_misc_food_107_venison", "inv_misc_food_108_meadcaribou", "inv_misc_food_109_honeylichen", "inv_misc_food_11", "inv_misc_food_110_emperorsalmon", "inv_misc_food_111_icefinfillet", "inv_misc_food_112_frostcaps", "inv_misc_food_12", "inv_misc_food_13", "axe_1h_draenei_b_01", "inv_axe_19", "inv_axe_64", "inv_belt_02", "inv_bijou_purple", "inv_boots_cloth_14", "inv_chest_cloth_10", "inv_chest_cloth_50", "inv_chest_leather_16", "inv_crown_15", "inv_drink_24_sealwhey", "inv_elemental_primal_shadow", "inv_fabric_linen_03", "inv_fishingpole_01", "inv_gauntlets_48", "inv_gizmo_felironshell", "inv_hammer_14", "inv_holiday_tow_spicepotion01", "inv_jewelcrafting_livingruby_03", "inv_jewelry_necklace_05", "inv_jewelry_necklace_41", "inv_jewelry_ring_30", "inv_jewelry_ring_70", "inv_jewelry_trinketpvp_01", "inv_mace_19", "inv_mace_55", "inv_misc_food_19", "inv_misc_food_59", "inv_misc_food_99", "inv_misc_gem_diamond_02", "inv_misc_gem_topaz_01", "inv_misc_head_tauren_02", "inv_misc_herb_mountainsilversage", "inv_misc_leatherscrap_06", "inv_misc_monsterclaw_02", "inv_misc_orb_03", "inv_misc_platnumdisks", "inv_misc_rune_02", "inv_misc_stonetablet_01", "inv_misc_ticket_tarot_twistingnether_01", "inv_musket_01", "inv_ore_mithril_01", "inv_pants_cloth_21", "inv_pants_mail_03", "inv_pants_plate_19", "inv_potion_112", "inv_potion_149", "inv_potion_35", "inv_potion_75", "inv_qiraj_skinsandworm", "inv_scarab_stone", "inv_shield_31", "inv_shirt_12", "inv_shoulder_25", "inv_shoulder_71", "inv_spear_14", "inv_staff_41", "inv_staff_83", "inv_stone_weightstone_04", "inv_sword_116", "inv_sword_2h_blood_c_02", "inv_sword_68", "inv_sword_draenei_08", "inv_valentineschocolate02", "inv_weapon_bow_10", "inv_weapon_crossbow_09", "inv_weapon_halberd_08", "inv_weapon_rifle_09", "inv_weapon_shortblade_22", "inv_weapon_shortblade_63", "spell_shadow_curseoftounges", "spell_shadow_painfulafflictions", "spell_shadow_summonsuccubus", "ability_rogue_tricksofthetrade", "achievement_arena_2v2_1", "achievement_bg_killingblow_30", "achievement_boss_bazil_akumai", "achievement_dungeon_naxxramas", "achievement_dungeon_utgardepinnacle", "achievement_level_80", "achievement_pvp_g_15", "achievement_pvp_p_03", "achievement_reputation_argentchampion", "achievement_zone_boreantundra_08", "achievement_zone_grizzlyhills_04", "achievement_zone_mulgore_01", "achievement_zone_tirisfalglades_01", "inv_axe_101", "inv_belt_45c", "inv_elemental_eternal_fire", "inv_ingot_yoggthorite", "inv_inscription_inkyellow04", "inv_inscription_minorglyph18", "inv_inscription_tarotprism", "inv_jewelcrafting_gem_21", "inv_letter_22", "inv_misc_enggizmos_26", "inv_misc_food_115_condorsoup", "inv_misc_gem_pearl_11", "inv_misc_monstertail_07", "inv_scroll_14", "inv_wand_27", "spell_deathknight_runetap", "spell_shadow_skull", "achievement_dungeon_drak'tharon_normal", "spell_deathknight_icytalons", "achievement_dungeon_ulduarraid_misc_02", "inv_wand_30", "achievement_dungeon_gloryoftheraider", "achievement_boss_anubarak", "inv_mace_103", "inv_sword_148", "inv_thanksgiving_pumpkinpie_act", "inv_bracer_36a", "inv_wand_35", "inv_pants_mail_30black", "inv_weapon_shortblade_108", "inv_misc_cape_26", "inv_belt_65", "inv_shoulder_116", "inv_shoulder_120", "inv_gauntlets_96", "achievement_ogrimshammer", "item_herbc", "inv_misc_food_meat_cooked_06", "inv_misc_ticket_tarot_warlords02", "inv_belt_86", "inv_chest_leather_28", "inv_bracer_73", "inv_chest_cloth_pvpwarlock_c_01", "inv_polearm_2h_bwdraid_d_01", "inv_sword_2h_cataclysm_b_01", "inv_misc_reforgedarchstone_01", "inv_shoulder_robe_dungeonrobe_c_04", "inv_misc_pearlring1", "inv_boots_cloth_cataclysm_b_01", "inv_shoulder_mail_dungeonmail_c_03", "inv_bracer_plate_pvpwarrior_c_01", "trade_archaeology_tuskarr_artifactfragment", "inv_gauntlets_102v2", "inv_misc_goblincup02", "inv_bracer_76v4", "inv_shoulder_134v3", "inv_mace_2h_deathwing_d_01", "thumbup", "inv_belt_91v2", "inv_boots_mail_13v3", "inv_bracer_70v1", "inv_chest_mail_19v2", "inv_gauntlets_115v3", "inv_pants_mail_40v2", "inv_shoulder_143v3", "trade_archaeology_highbornesoulmirror", "ability_rogue_ruthlessness", "ability_rogue_dirtydeeds", "inv_chest_leather_raiddruid_i_01", "inv_gauntlets_leather_cataclysm_b_02", "bow_1h_pvp400_c_01", "inv_axe_1h_pvp400_c_01", "inv_misc_addsocketglove", "inv_misc_enchantedelementiumrod", "inv_misc_volatileshadow", "inv_misc_uncutgemnormal2", "inv_potionf_5", "spell_druid_stampedingroar_cat", "inv_misc_enggizmos_34", "inv_pant_mail_raidhunter_i_01", "inv_misc_necklacea12", "inv_belt_mail_pvphunter_c_02", "inv_belt_mail_pvpshaman_c_02", "inv_chest_cloth_pvpwarlock_c_02", "inv_trinket_firelands_01", "inv_mace_1h_sulfuron_d_01", "inv_misc_ring_firelands_1", "creatureportrait_twilightshammer_summoningportal_water01", "inv_glove_mail_raidhunter_j_01", "inv_pants_plate_dungeonplate_c_05", "inv_relics_hourglass", "inv_axe_1h_pvpcataclysms3_c_01", "inv_offhand_1h_deathwingraid_d_01", "inv_misc_token_darkmoon_01", "inv_chest_mail_pvpshaman_d_01", "inv_helmet_plate_raidwarrior_k_01", "inv_knife_1h_pvpcataclysms3_c_01", "inv_helmet_leather_pvprogue_d_01", "inv_knife_1h_deathwingraid_e_03", "ability_deathwing_sealarmorbreachtga", "ability_mage_frostjaw", "inv_boot_leather_panprog_b_01", "inv_glove_mail_panprog_b_01", "spell_nature_heavypolymorph1", "spell_warrior_wildstrike", "inv_belt_leather_panda_b_01", "inv_chest_cloth_challengepriest_d_01", "inv_boot_mail_challengeshaman_d_01", "ability_monk_legacyoftheemperor", "spell_monk_brewmaster_spec", "trade_alchemy_potione4", "inv_misc_2h_bamboo_fishing", "inv_pants_leather_panda_b_02", "inv_misc_herb_rainpoppy", "achievement_zone_kunlaisummit_loremaster", "inv_shoulder_plate_challengewarrior_d_01", "inv_cape_panprog_b_01", "inv_bracer_plate_reputation_c_01", "inv_helmet_leather_raidmonk_l_01", "inv_pants_leather_pvpmonk_e_01", "inv_misc_gem_x4_uncommon_perfectcut_green", "inv_jewelry_ring_127", "inv_boot_mail_raidhunter_l_01", "inv_jewelry_necklace_56", "inv_helmet_plate_pvpwarrior_e_01", "inv_belt_leather_pvpdruid_e_01", "inv_pet_battlepettraining", "spell_misc_petheal", "inv_legendary_shield", "inv_jewelry_trinket_08", "archaeology_5_0_thunderkinginsignia", "inv_pants_cloth_panda_b_02_blue", "inv_belt_leather_panda_b_01red", "inv_chest_leather_panda_b_02_brown", "inv_boots_mail_panda_b_02", "inv_jewelry_necklace_103", "achievement_challengemode_scarlethalls_platinum", "achievement_guild_level30", "sha_spell_fire_blueimmolation", "inv_shoulder_mail_panda_b_01black", "inv_misc_food_vendor_boiledsilkwormpupa", "inv_belt_cloth_reputation_c_01", "inv_pet_babycloudserpent_gold", "petbattle_health-down", "inv_pet_achievement_extra02", "ability_mount_pandaranmountepicblack", "inv_pet_cats_calicocat", "inv_boots_plate_pvpdeathknight_f_01", "inv_sword_1h_pvppandarias2_c_02", "inv_boot_cloth_pvppriest_f_01", "inv_chest_mail_raidhunter_m_01", "icon_upgradestone_flying_rare", "inv_sword_2h_thunderisleraid_d_01", "inv_helm_leather_raidrogue_m_01", "inv_helm_plate_pvpwarrior_f_01", "inv_misc_foxkit_white", "inv_staff_2h_humanpriest_c_01", "inv_jewelry_ring_162", "inv_jewelry_ring_177", "spell_monk_nimblebrew", "spell_fire_fireballgreen2", "inv_sword_1h_pvppandarias3_c_02", "inv_pants_mail_pvphunter_g_01", "knife_1h_pvppandarias3_c_01_icon", "inv_bow_1h_orgrimmarraid_d_02", "inv_skeletalwarhorse", "ability_iyyokuk_bomb_purple", "inv_misc_noodle_cart_intermediate_level", "inv_mace_1h_orgrimmarraid_d_04", "inv_boots_plate_raidwarrior_n_01", "achievement_boss_norushen", "ability_mount_ironjuggernautmount", "timelesscoin", "inv_misc_potionbag_special", "inv_axe_1h_warsongclan_c_01", "inv_offhand_1h_draenorquest95_b_01", "racechange", "inv_leather_draenorquest95_b_01bracer", "inv_pant_plate_draenorquest95_b_01", "inv_mace_1h_draenorcrafted_d_01_b", "inv_offhand_1h_draenorcrafted_d_02a", "inv_misc_herb_nightmarevine_stem", "inv_misc_herb_lichbloom_stalk", "inv_sword_1h_draenorcrafted_d_02_a_horde", "inv_ore_blackrock_nugget", "trade_alchemy_dpotion_a15", "inv_sword_1h_pvpdraenors1_d_01", "inv_fishing_f_gulper1", "inv_fishing_lure_kelp", "inv_cloth_draenorcrafted_d_01boots_horde", "inv_robe_leather_draenorcrafted_d_01_horde", "inv_misc_trinket6oog_mask1", "monk_stance_redcrane", "inv_sword_2h_draenorraid_d_01", "ability_mount_ravager2mount", "inv_boot_cloth_raidmage_o_01", "inv_archaeology_orcclans_doomsdaytablet", "achievement_challengemode_upperbrspire_bronze", "inv_enchanting_wod_essence3", "achievement_boss_highmaul_earthenfury", "inv_misc_necklace_6_0_015", "inv_pant_plate_pvppaladin_o_01", "inv_belt_mail_raidhunter_o_01", "inv_cloth_raidwarlockmythic_o_01helm", "inv_tradeskillitem_sorcerersearth_tong", "inv_60dungeon_ring6d", "inv_shoulder_plate_pvppaladingladiator_o_01", "inv_60crafted_ring2a", "inv_misc_necklace_6_0_038", "inv_plate_plate_pvpwarriorgladaitor_o_01bracer", "inv_ringwod_d4_4", "ability_blackhand_marked4death", "ability_paladin_empoweredsealsinsight", "garrison_purplearmorupgrade", "inv_shoulder_cloth_pvpmage_o_01", "inv_jewelcrafting_greateramplifier", "spell_hunter_exoticmunitions_frozen", "ability_ironmaidens_impale", "inv_pant_cloth_draenorhonor_c_01", "inv_bullroarer", "inv_tabard_a_shataridefense", "inv_60pvp_ring4b", "achievement_garrison_invasion_ten", "icon_podlingsilver", "inv_boot_cloth_shadowmoonclan_b_01", "inv_pant_mail_pvpshaman_o_01", "inv_staff_2h_draenorraid_d_03", "ability_fomor_boss_pillar01", "ability_priest_ascension", "inv_misc_1h_bucket_b_01", "inv_misc_6oring_greenlv2", "inv_6_0raid_necklace_3a", "inv_chest_leather_raiddruid_p_01", "inv_chest_mail_raidhuntermythic_p_01", "inv_bracer_cloth_draenorhonors2_c_01", "inv_axe_1h_draenorhonors2_c_02", "inv_glove_mail_raidshamanmythic_p_01", "inv_polearm_2h_felfireraid_d_01", "inv_boot_leather_raidmonk_p_01", "inv_sword_2h_artifactashbringerpurified_d_03", "achievement_boss_hellfire_socrethar", "inv_glove_mail_legionquest100_b_01", "inv_throwingchakrum_01_fel", "inv_6_2raid_trinket_3d", "inv_helm_plate_legiondungeon_c_01", "inv_chest_mail_legiondungeon_c_01", "inv_bracer_plate_legionhonor_d_01", "inv_helmet_mail_legionendgame_c_01", "inv_tabard_a_82awakenedorder", "inv_mace_1h_artifactazshara_d_05", "inv_chest_leather_vrykulhunter_b_01", "inv_boot_leather_demonhunter_a_01gold", "inv_bracer_mail_vrykuldragonrider_b_01", "inv_staff_2h_artifacttome_d_04", "inv_wolfdraenormountrusticyellow", "inv_hand_1h_artifactskywall_d_03dual", "inv_leather_raidrogue_q_01chest", "inv_leather_raiddemonhuntermythic_q_01helm", "inv_belt_plate_raiddeathknight_q_01", "inv_mace_1h_artifactazshara_d_06", "inv_offhand_1h_artifactcthun_d_02", "inv_turtlemount", "ability_demonhunter_immolation", "inv_helm_plate_raiddeathknightmythic_q_01", "inv_staff_2h_artifactelune_d_06", "inv_7_0raid_necklace_02b", "inv_7_0raid_necklace_12b", "ability_monk_ironskinbrew", "inv_7_0raid_trinket_06c", "ability_rogue_rollthebones", "inv_enchanting_70_chaosshard", "inv_jewelcrafting_70_maxlvlneck_yellow", "spell_warrior_barbarian", "inv_alchemy_70_trinket", "inv_fish_oodelfjiskblue", "inv_misc_food_legion_leanshank", "ability_bossmagistrix_timewarp2", "inv_70_quest_ring5b", "inv_70_raid_ring6b", "artifactability_guardiandruid_goryfur ", "70_inscription_deck_promises", "inv_legion_faction_kirintor", "inv_jewelcrafting_70_cutgem02_blue", "inv_blacksmith_leystonehoofplates", "inv_leather_raiddemonhunter_q_02mythicbracer", "inv_artifact_xp05", "timelesscoin_yellow", "inv_tabard_a_89dreamweaver", "inv_cloth_warlockclass_d_01buckle", "inv_mail_shamanclass_d_01boots", "inv_legioncircle_cache_dreamweavers", "inv_sword_1h_ebonblade_b_02_red", "inv_misc_food_legion_seashellg2", "inv_misc_scrollunrolled04b", "inv_misc_food_legion_goosaporange_bottle", "inv_stormdragonmount2blue", "inv_misc_notescript2a", "inv_misc_felsaber_claw", "inv_misc_raptorfoot_blue", "inv_boot_cloth_legionraid_d_01", "inv_bracer_cloth_raidpriest_r_01", "inv_misc_chamferchest03", "inv_misc_voljinsshatteredtusk", "achievement_legionpvp2tier3", "inv_misc_scales_fishgreen02", "diabloanniversary_charm1", "vas_charactertransfer", "inv_jewelcrafting_bluepanther", "inv_misc_necklace_bone03", "achievement_raid_tombofsargeras", "inv_misc_treasurechest04d", "achievement_boss_titanconstructshell", "inv_boot_leather_raidrogue_r_01", "inv_glove_plate_raiddeathknight_r_01", "inv_bracer_cloth_raidmagemythic_s_01", "inv_bracer_mail_raidshamanmythic_s_01", "inv_helm_cloth_legiondungeon_c_03", "inv_soulhoundmount_white", "inv_cape_legionpvps6_alliance", "inv_sword_1h_hordetoy_a_01", "inv_legion_chest_nightmare", "inv_helm_plate_raidpaladin_s_01", "inv_armor_chest_lightforgeddraenei_d_01", "inv_bracer_leather_raiddruid_s_01", "inv_leather_raidroguemythic_s_01_pant", "inv_blowdart_bloodtroll", "inv_belt_mail_chromiescenario_c_01", "inv_cape_plate_zandalarquest_b_01", "inv_tailoring_lightweavecloth", "ability_mage_glacialspike", "inv_pet_naaru_purple", "achievement_raid_argusraid", "inv_lightforgedelekk_blue", "inv_misc_primitive_toy03", "inv_misc_rope_01_yellowred", "inv_bloodticklarvaedarkred", "inv_boot_armor_nightborne_d_01", "ivn_bracer_armor_zandalaritroll_d_01", "inv_babyturtle2_teal", "ability_argus_soulbombdebufflarge", "inv_glove_armor_darkirondwarf_d_01", "inv_leather_warfrontsalliance_c_01_pant", "inv_sword_1h_warfrontshorde_c_01", "inv_fungarian_red", "inv_chest_mail_warfrontsalliance_d_01", "inv_leather_warfrontshorde_c_01_pants", "inv_pant_leather_kultirasdungeon_c_01", "inv_belt_cloth_kultirasdungeon_c_01", "inv_belt_mail_nazmirraidmythic_d_01", "inv_ring_80_04e", "inv_trinket_80_zandalrari01e", "inv_cape_plate_warfrontsalliance_d_01", "achievement_dungeon_hadaldarkfathom", "achievement_dungeon_yazma", "achievement_rankedpvp_01", "inv_babykomododragon_white", "inv_desertlasherorchid_purple", "inv_komododragon_brown", "inv_skinning_80_ambertanningoil", "inv_helm_mail_warfrontshorde_b_01", "inv__fistofthewhitetiger", "inv_helm_cloth_b_01pirate_blacktoothbrawlers", "inv_faction_alliancewarfront_round_voidelf", "inv_shoulder_cloth_nazmirraid_d_01", "inv_firstaid_deep sea satin", "inv_tortollanhead", "inv_elementalearth2", "inv_icon_feather04b", "inv_icon_wing02b", "inv_icon_wingbroken02b", "inv_eng_bombroot", "inv_prairiedog_brown", "inv_horse3_pale", "inv_horse3saddle006_stormsong_chestnut", "spell_arcane_teleportzandalar", "inv_inscription_80_deck_tides2", "inv_zandalariempire", "inv_tabard_battlepvps4_horde", "inv_belt_mail_zuldazarraid_d_01", "inv_leather_warfrontsforsakenmythic_d_01buckle", "inv_shoulder_leather_zuldazarraidmythic_d_01", "inv_helm_mail_warfrontsnightelfmythic_d_01", "inv_wand_1h_zuldazarraid_d_01", "inv_frog2_yellow", "ui_darkshore_warfront_alliance_dryad", "inv_drakemount_red", "inv_boot_cloth_warfrontsnightelf_d_01", "inv_sword_2h_warfrontsnightelf_d_01", "inv_boot_armor_bloodelf_d_01", "inv_pants_cloth_warfrontsforsaken_d_01", "inv_bfa_paragoncache_stormswake", "ui_darkshore_warfront_horde_lancer", "inv_encrypted14", "inv_snapdragonmount02", "inv_chest_plate_nazjatarraid_d_01", "inv_helm_cloth_nazjatarraid_d_01", "inv_robe_mail_nazjatarraidmythic_d_01", "inv_alpacamount_ivory", "inv_jewelry_mech_ring_green", "spell_azerite_essence07", "inv_pant_leatherraidnzothmythic_d_01", "inv_cooking_82_rubberyflank", "inv_belt_mail_nzothraidmythic_d_01", "inv_chest_cloth_nzothraidmythic_d_01", "inv_automatonlionmount2_black", "inv_bracer_armor_faeriedragon_d_01", "inv_decomposermountgreen", "inv_shoulder_armor_vulpera_d_01", "spell_nzinsanity_bloodthirst", "ability_racial_rearm", "inv_sword_2h_maldraxxusquest_b_01", "inv_belt_leather_maldraxxus_d_01", "inv_pant_oribosquesting_b_01", "inv_bracer_mail_oribosdungeon_c_01", "inv_belt_leather_revendreth_d_01", "inv_polearm_2h_ardenwealdnpc_a_01", "inv_cape_special_revendreth_d_02", "spell_animaardenweald_missile", "inv_blacksmithing_lesserweightstone", "inv_neck_ardenweald_01_red", "inv_ring_maldraxxus_01_violet", "inv_trinket_bastion_02_gold", "inv_chest_mail_ardenweald_d_01", "inv_cloth_mawraidmythic_d_01_bracer", "inv_pant_mail_bastion_d_01", "ability_revendreth_mage", "inv_alchemy_90_combat2_red", "inv_glove_mail_revendreth_d_01", "inv_mawroach_orange", "inv_boot_leather_mawraid_d_01", "inv_shadebeastmount_gray", "achievement_dungeon_mistsoftirnascithe_tredova", "inv_engineering_90_ardenwealdgrenade_yellow", "achievement_raid_revendrethraid_kaelthassunstrider", "inv_mace_2h_maw_c_02", "ability_mount_mawhorsespikes_teal", "inv_cooking_90_meatyappledumplings", "inv_inscription_pigment_luminous01", "inv_inscription_talentcodex01", "inv_treepet", "inv_jewelcrafting_90_cutuncommon_blue", "inv_mawguardhandmountpurple", "inv_fox2_white", "inv_armor_celestial_d_01_buckle", "inv_automatonfliermount_copper", "mace_2h_progenitor_d_01_inv", "inv_giantbeastmount_green", "inv_ring_mawraid_02_purple", "inv_bloodlousepet_white", "inv_shoulder_cloth_raidwarlockprogenitor_d_01", "inv_mawexpansionfliermountwhite", "inv_glove_plate_raidwarriorprogenitor_d_01", "inv_mammoth2pet_dark", "inv_trinket_progenitorraid_01_blue", "inv_knife_1h_progenitorraid_d_01", "inv_polearm_2h_mawnecromancerboss_d_01_gold", "inv_wolfserpentmountgreen", "spell_progenitor_orb2", "inv_pants_plate_raidpaladinprogenitormythic_d_01", "inv_polearm_2h_dragonquest_b_01", "inv_misc_supersoulash", "inv_cloth_broker_c_01_pant", "inv_leather_dragondungeon_c_01_pant", "inv_plate_raiddeathknightprogenitor_d_01_glove", "inv_drakonidpet", "inv_offhand_1h_dynamite_a_01", "inv_fishing_progenitorfish", "inv_progenitorelemental_blue", "inv_prg_icon_puzzle01", "inv_achievement_raid_progenitorraid_proto_denathrius", "inv_collections_armor_neckerchief_b_01_royalpurple", "inv_sword_2h_deathknight_c_01", "inv_plate_dragondungeon_c_01_cape", "inv_axe_1h_shaman_c_01", "cosmicenergy_rune_k_on", "inv_cloth_raidmageprimalist_d_01_belt", "inv_knife_1h_skinning_a_01", "inv_sword_1h_quest_b_01", "inv_10_alchemy_bottle_shape4_yellow", "inv_item_protodragonegg_earthbroken01", "inv_armor_phoenix_d_02_glove", "inv_staff_2h_drakonid_c_02", "inv_helm_armor_herbalism_b_01", "inv_10_engineering_manufacturedparts_electricalparts_color4", "inv_10_jewelcrafting_necklace_necklace3_color1", "inv_10_enchanting_dust_color2", "inv_10_inscription2_repcontracts_80_scroll_uprez_color5", "inv_10_tailoring_bag2_color3", "inv_10_tailoring_tailoringconsumable_color2", "inv_10_alchemy2_specialcraftersfinishingreagent_color1", "inv_10_elementalcombinedfoozles_lightning", "inv_10_inscription_darkmooncards_earth_7", "inv_10_inscription_ink_color4", "inv_10_jewelcrafting_gem3primal_cut_black", "inv_10_jewelcrafting_gem2standard_earth_cut_red", "inv_10_jewelcrafting_gem3primal_frost_cut_bronze", "inv_helm_armor_engineering_b_01_orange", "inv_10_skinning_leather_heavyleather_color1", "inv_dragonwhelp3_red", "inv_cape_plate_dragonpvp_d_01", "inv_cape_special_tuskarr_b_03_grey", "inv_drink_15_color02", "inv_10_blacksmithing_consumable_weightstone_color2", "ability_evoker_livingflame", "inv_10_specialization_alchemy_laboratorytechniques_color2", "inv_10_tailoring2_banner_red", "inv_10_specialization_professionbook_blacksmithing_color1", "inv_sword_1h_dragonquest_b_01", "ability_evoker_hoverred", "inv_10_jewelcrafting2_glassshards_color1", "inv_plate_dragondungeon_c_01_boot", "inv_10_dungeonjewelry_primitive_necklace_1gnollharpy_color4", "inv_10_specialization_leatherworking_leatherworkingmastery_color2", "inv_10_inscription_darkmooncards_frost2_3", "inv_10_dungeonjewelry_centaur_trinket_2_color2", "inv_10_dungeonjewelry_tuskarr_necklace_1_color2", "inv_10_dungeonjewelry_dragon_necklace_1_black", "inv_10_dungeonjewelry_dragon_trinket_4_black", "inv_10_dungeonjewelry_primalist_trinket_1ragingelement_air", "achievement_guildperk_happyhour_color03", "ability_dragonriding_barrelroll01", "inv_10_specialreagentfoozles_coolegg_black", "ability_hunter_callofthewild", "inv_cooking_100_foamybottle_color03", "inv_shoulder_armor_dragonspawn_c_02_black", "inv_mace_1h_tuskarr_b_01", "inv_helm_armor_cenarion_c_01", "inv_helm_armor_engineering_b_02_goblin", "10prof_portabletable_engineering01", "inv_mace_1h_blackdragonoutdoor_d_01", "inv_bracer_mail_raidevokerdragon_d_01", "inv_chest_leather_raidroguedragon_d_01", "inv_pant_mail_dracthyr_c_01", "inv_mail_outdoorblackdragon_d_01_glove", "inv_shadowflame_beam", "inv_leather_raiddruiddragon_d_01_chest", "inv_mail_raidhunterdragon_d_01_bracer", "inv_sporebatrock_red", "inv_polearm_2h_forsakenundercityguard_01", "inv_cape_plate_raidwarriordragon_d_01", "inv_10_inscription_darkmooncards_spore2_6", "inv_lunardragonmount", "inv_chest_armor_civiliancraftsperson_b_01", "inv_achievement_raiddragon_forgottenexperiments", "flightstone-dragonflight", "inv_sword_1h_emeralddreamraid_d_02", "ability_evoker_defyfate", "inv_staff_2h_plunderkey_c_01_gold", "inv_glove_armor_troll_d_01", "inv_offhand_1h_candybucket_b_01", "inv_broommount2_red", "inv_offhand_1h_reliquarybook_b_01_red", "inv_10_gearupgrade_wyrmsdreamingenhancedcrest", "inv_glove_armor_dreadlordsregalia_c_01", "inv_boot_armor_gryphonrider_d_01_bronze", "inv_helm_armor_gryphonrider_d_01_bronze", "inv_achievement_raidemeralddream_keeperoftheflames", "inv_sword_2h_undergroundquest_b_01", "10_2_raidability_treant", "inv_pants_armor_sylvanas_d_01", "inv_helm_armor_masquerade_b_02", "inv_axe_2h_nerubianraid_d_01", "inv_valentinescandy01", "inv_cloth_raidpriestnerubian_d_01_belt", "inv_ladybugpet_pink", "inv_peacockmount_blue", "ui_followerdungeon_youlead", "inv_sword_1h_plunder_c_01", "inv_armor_hallowfallarathi_c_01_shoulder", "inv_babyarathilynx_gold", "inv_shoulder_leather_raidroguegoblin_d_01", "inv_sword_1h_faerin_d_01", "inv_armor_diversuit_d_01_bracer", "inv_shoulder_armor_earthencivilian_d_01_silver", "inv_armor_summerswimsuit_c_02_pant", "inv_cape_leather_undergroundquest_b_01", "inv_ability_web_buff", "inv_molemountbasic_light", "inv_pant_leather_raiddruidnerubian_d_01", "inv_blue_sporecreature2", "inv_armor_earthendwarf_d_01_bracer", "inv_armor_earthencivilian_d_02_glove", "inv_axe_1h_earthenaxe_b_01", "ui_notoriety_theweaver", "inv_knife_1h_kaldoreiblade_c_01", "inv_crabcave_black", "inv_shoulder_cloth_raidmagenerubian_d_01", "inv_toygorilla_yellow", "inv_ability_skyriding_glyph", "inv_ability_totemicshaman_surgingtotem", "inv_magic_swirl_color4", "inv_blacksmithingalloys_purlple", "jewelcrafting_cut standart gem_color3", "inv_jewelcrafting_cut standart gem_color1", "inv_arathor_necklace_01_color3", "inv_earthen_earthennecklace02_color4", "inv_misc_kobysstools_knifetrap_color2", "inv_ventureco_necklace02_color5", "inv_raid_sikransarsenal_green", "inv_inscriptions_darkmoondeckfortune_4", "inv_nullstone_void", "inv_11_0_raid_aberrantspellforge_green", "inv_11_0_arathor_necklace_02_color1", "inv_11_0_earthen_earthenring_color2", "inv_11_0_misc_organmass_color1", "inv_11_0_ventureco_ring01_color3", "inv_tinkermodule_orange", "inv_ability_rogue_echoingreprimand", "inv_shoulder_plate_raidwarriorgoblin_d_01", "inv_leather_raiddruidt2_d_01_shoulder", "inv_staff_2h_winterveil_b_01", "inv_cloth_raidmaget2_d_01_boot", "inv_30thgryphonmount_gold", "inv_hand_1h_clockwork_d_01", "inv_cape_pvp_11season3_d_01", "inv_bracer_armor_clockwork_d_01", "inv_11_arenaboss_galvanizedspite", "inv_mail_outdoorundermine_c_01_bracer", "inv_rat2undermine_brown", "inv_mace_1h_outdoorethereal_c_02", "inv_glove_plate_raiddeathknightethereal_d_01", "inv_111_gallyjack_steamwheedle", "inv_111_moltengoldknuckles_ventureco", "inv_111_underminegangsterdisguise", "inv_pant_armor_chen_c_01_armor_icons", "inv_chihuahuadogpet_costume_shark blue", "inv_tabard_twilightblade_b_01", "inv_ravenmount_white", "inv_plate_raidpaladinethereal_d_01_helm", "inv_quiver_bow_1h_forsaken_d_01", "inv_shield_1h_chess_d_01", "inv_sword_2h_forsaken_d_01", "inv_cape_armor_chess_d_01", "inv_chest_plate_raidwarriorethereal_d_01", "inv_felstalkermount_green", "inv_stalkermount_orange", "inv_black_hawkstrider", "inv_glove_armor_bloodelfcivilianb_b_01", "inv_paladinmount_fel", "inv_pant_cloth_raidwarlockethereal_d_01", "inv_babysnaplizard_black", "inv_112_raiddimensius_brokenworld", "inv_chest_plate_dungeonharronir_c_01", "inv_112_raidtrinkets_intdps_ancientkareshirelic", "inv_112_raidtrinkets_socketlegendarycloak_empowered_red", "inv_kaijubatmount_blue", "inv_helm_armor_winter_d_01", "inv_glove_armor_food_b_01", "ui_majorfaction_candle_256", "inv_axe_1h_questbloodelf_b_01", "inv_sealpet_body_tuskarr", "inv_10xp_generic_toy_treasurebowltoy01", "inv_shoulder_plate_raidpaladinmidnight_d_01", "inv_arcanegolem2mount_white", "inv_belt_leather_outdoorvoidelf_c_01", "inv_armor_scarlet_c_01_chest", "inv_staff_2h_raidmidnight_d_01", "inv_chest_plate_raidwarriormidnight_d_01", "inv_glove_leather_raidmonkmidnight_d_01", "inv_12be_bloodelf_defense_shield01", "inv12_ability_monk_sheilunsgift", "inv_cape_leather_raiddruidmidnight_d_01", "inv_helm_cloth_raidpriestmidnight_d_01", "housing-dye-mahogany", "inv_kaijubatmount_red", "ui_resourcelumbershadowlands", "inv_horse3_pinkblanche", "inv_cosmicvoid_groundstate", "inv_12ph_bloodelf_ibe01_partition_w_l_icon", "inv_hand_1h_gilneas_b_01", "inv_12_profession_alchemy_flask_sindoreipotion_red  ", "inv_12_profession_cooking_genericmeat_substitutedishes_purplered", "inv_12_profession_enchanting_manaoil_red", "inv_12_profession_inscriptions_darkmoondeck_bloom_4", "inv_12_profession_inscriptions_darkmoondominions_void", "inv_12_profession_jewelcrafting_glass_reagentraw_red", "inv_12_profession_jewelcrafting_ring2_silver", "inv_12_profession_leatherworking_armor_banding_green", "inv_12_profession_skinning_thalassianhide_brown", "inv_12_profession_questandcrafting_sparkwhole_green", "inv12_ability_priest_madness_scream", "inv12_jewelrytrinkets_haranir_pendant_blue1", "inv12_jewelrytrinkets_voidelf_pendant_black", "inv_12_dualityphoenix_void_feather", "inv_12_jewelry_haranir_necklace_yellow1", "inv_12_jewelry_voidelf_ring_purple", "inv_12_trinket_devouring_host_currency3_silver", "inv_120_crest_hero", "inv_1205_voidforge_midnight", "inv_boot_armor_summer_d_01", "inv_boot_armor_corehound_c_01"];
+const PSYCHO_PRESETS=[{"lt": "Chaotic", "rt": "Lawful"}, {"lt": "Chaste", "rt": "Lustful"}, {"lt": "Forgiving", "rt": "Vindictive"}, {"lt": "Altruistic", "rt": "Selfish"}, {"lt": "Truthful", "rt": "Deceitful"}, {"lt": "Gentle", "rt": "Brutal"}, {"lt": "Superstitious", "rt": "Rational"}, {"lt": "Renegade", "rt": "Paragon"}, {"lt": "Cautious", "rt": "Impulsive"}, {"lt": "Ascetic", "rt": "Bon vivant"}, {"lt": "Valorous", "rt": "Spineless"}];
+const RACES=["Human", "Dwarf", "Night Elf", "Gnome", "Draenei", "Worgen", "Pandaren", "Dark Iron Dwarf", "Void Elf", "Lightforged Draenei", "Kul Tiran", "Mechagnome", "Orc", "Undead", "Tauren", "Troll", "Blood Elf", "Goblin", "Nightborne", "Highmountain Tauren", "Mag'har Orc", "Zandalari Troll", "Vulpera", "Dracthyr", "Earthen", "Other"];
+const CLASSES=["Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Death Knight", "Shaman", "Mage", "Warlock", "Monk", "Druid", "Demon Hunter", "Evoker", "Adventurer", "Commoner", "Other"];
+
+
+function SAMPLE_PROFILE(){ return { player:{
+  characteristics:{ v:1, IC:"achievement_character_dwarf_male",
+    TI:"", FN:"Baern", LN:"Ironmantle", FT:"Emberbound",
+    RA:"Dark Iron Dwarf", CL:"Forgekeeper", CH:"e57d3a",
+    AG:"152", EC:"Ember-orange", HE:"4'7\"", WE:"Stocky, forge-built",
+    BP:"Shadowforge City", RE:"The Undying Forge",
+    PS:[
+      {LT:"Chaotic",RT:"Lawful",VA:15,LC:"b5481f",RC:"caa24a",LI:"spell_fire_fire",RI:"inv_hammer_16"},
+      {LT:"Gentle",RT:"Brutal",VA:6,LC:"6fa8dc",RC:"7a2d12",LI:"spell_holy_sealofwisdom",RI:"ability_warrior_decisivestrike"},
+      {LT:"Ascetic",RT:"Bon vivant",VA:8,LC:"888888",RC:"d24b01",LI:"inv_misc_food_15",RI:"inv_drink_05"}
+    ],
+    MI:[
+      {IC:"inv_hammer_16",NA:"Order",VA:"The Order of the Undying Forge"},
+      {IC:"inv_misc_book_11",NA:"Creed",VA:"Carry the ember. Leave the warmth."}
+    ],
+    PE:{
+      "1":{AC:true,IC:"spell_fire_fire",TI:"The Forge",TX:"Tends an everburning hearth said never to cool. Will mend a tool or a spirit for any traveller."},
+      "2":{AC:true,IC:"inv_hammer_16",TI:"Hammer & Anvil",TX:"A master smith. Weapons, armor, and the occasional broken promise repaired."},
+      "3":{AC:true,IC:"inv_misc_book_11",TI:"Tenets",TX:"Lives by three tenets: the forge never cools, bear the hammer first, leave every hearth warmer."},
+      "4":{AC:false,IC:"inv_misc_questionmark",TI:"",TX:""},
+      "5":{AC:false,IC:"inv_misc_questionmark",TI:"",TX:""}
+    } },
+  about:{ v:1, TE:1, BK:23, T2:[], T3:{PH:{TX:""},PS:{TX:""},HI:{TX:""}},
+    T1:{TX: "{img:Interface\\PETBATTLES\\Weather-BurntEarth:1024:128:r}{img:Interface\\PETBATTLES\\Weather-BurntEarth:1024:128:l}\n{h1:c}{col:d24b01}Baern Ironmantle{/col}{/h1}\n{h2:c}{col:d24b01}Emberbound{/col}{/h2}\n{img:Interface\\PETBATTLES\\Weather-Windy:512:3}\n{h2:c}{col:d24b01}The Order of the Undying Forge{/col}{/h2}\n{h3:c}{col:d24b01}Tenets of the Forge{/col}{/h3}\n{img:Interface\\PETBATTLES\\Weather-Windy:512:3}\n{h3:c}{col:555555}I. The Forge Never Cools{/col}{/h3}\n{p:c}{col:555555}\nNo soul is ever finished.\nJust as steel is folded, reheated, and tempered many times before it reaches its true strength, so too is every life a work forever in progress. Pride is the belief that one's forging is complete; wisdom is knowing there is always another lesson to learn.\n\"The cold blade breaks. Return to the fire willingly.\"\n{/col}{/p}\n{img:Interface\\PETBATTLES\\Weather-Windy:512:3}\n{h3:c}{col:555555}II. Bear the Hammer Before the Flame{/col}{/h3}\n{p:c}{col:555555}\nChange begins within before it is sought in others.\nThe Emberbound do not preach perfection. They seek first to master their own temper, their own failings, and their own doubts. Only by bearing the weight of the hammer upon oneself may one offer guidance to another.\n\"Strike your own steel before judging another's.\"\n{/col}{/p}\n{img:Interface\\PETBATTLES\\Weather-Windy:512:3}\n{h3:c}{col:555555}III. Leave Every Hearth Warmer{/col}{/h3}\n{p:c}{col:555555}\nWherever you journey, leave people stronger than you found them.\nThe purpose of the road is not conquest, but kindness. Every shared meal, every mended tool, every lesson taught, every burden eased is another ember added to the world's fire. Faith is measured not by words, but by what remains after you've gone.\n\"Carry the ember. Leave the warmth.\"\n{/col}{/p}"} },
+  misc:{ v:1,
+    CO:"{col:d24b01}Tending the forge.{/col} Travellers and the weary are always welcome at the hearth.",
+    CU:"Walk-up friendly. Long-form story preferred over combat-RP." }
+}}; }
+</script>
+<div class="wrap">
+  <header class="top">
+    <div class="crest">TRP</div>
+    <div class="titles">
+      <h1>TRP3 Forge</h1>
+      <p>Design a Total RP 3 profile outside the game — with real WoW assets</p>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn" id="btnNew">New</button>
+    <button class="btn" id="btnImport">Import</button>
+    <button class="btn dark" id="btnExport">Export JSON</button>
+    <button class="btn ember" id="btnSample">Sample</button>
+  </header>
+
+  <div class="layout">
+    <!-- ============ EDITOR ============ -->
+    <section class="panel" aria-label="Editor">
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="char" role="tab">Characteristics</button>
+        <button class="tab" data-tab="about" role="tab">About</button>
+        <button class="tab" data-tab="misc" role="tab">Misc &amp; Traits</button>
+        <button class="tab" data-tab="io" role="tab">Data</button>
+      </div>
+      <div class="scroll">
+      <div class="body">
+
+        <!-- CHARACTERISTICS -->
+        <div class="tabpane active" data-pane="char">
+          <div class="iconpick" style="margin-bottom:14px">
+            <button class="iconbtn" id="charIconBtn" title="Choose profile icon"><span class="ph">icon</span></button>
+            <div>
+              <div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--ink-soft);font-weight:600">Profile Icon</div>
+              <div class="hint">Click to browse in-game icons.</div>
+            </div>
+          </div>
+          <div class="row">
+            <label class="f"><span>Title (prefix)</span><input type="text" id="TI" placeholder="e.g. Captain"></label>
+            <label class="f"><span>First name</span><input type="text" id="FN" placeholder="Required"></label>
+          </div>
+          <div class="row">
+            <label class="f"><span>Last name</span><input type="text" id="LN"></label>
+            <label class="f"><span>Full title</span><input type="text" id="FT" placeholder="e.g. the Vow-Keeper"></label>
+          </div>
+          <div class="row">
+            <label class="f"><span>Race</span><input type="text" id="RA" list="raceList" placeholder="Type or pick"><datalist id="raceList"></datalist></label>
+            <label class="f"><span>Class</span><input type="text" id="CL" list="classList" placeholder="Custom — type anything"><datalist id="classList"></datalist></label>
+          </div>
+          <label class="f"><span>Class color</span>
+            <div class="bgpick">
+              <input type="color" id="CHcolor" value="#e57d3a">
+              <input type="text" id="CHcolorHex" maxlength="6" style="width:110px" placeholder="e57d3a">
+              <span class="hint">6-digit hex. Tints the class on the profile.</span>
+            </div>
+          </label>
+          <div class="row3">
+            <label class="f"><span>Age</span><input type="text" id="AG" placeholder="e.g. 31"></label>
+            <label class="f"><span>Eye color</span><input type="text" id="EC"></label>
+            <label class="f"><span>Height</span><input type="text" id="HE"></label>
+          </div>
+          <div class="row3">
+            <label class="f"><span>Weight / build</span><input type="text" id="WE"></label>
+            <label class="f"><span>Birthplace</span><input type="text" id="BP"></label>
+            <label class="f"><span>Residence</span><input type="text" id="RE"></label>
+          </div>
+
+          <!-- Additional Information ABOVE Personality -->
+          <div class="sec-h">Additional Information</div>
+          <div class="hint" style="margin-bottom:10px">Shows as the “additional information” list on the profile. Each entry has an icon, a label, and a value.</div>
+          <div id="miscList"></div>
+          <button class="addbtn" id="addMisc">+ Add field</button>
+
+          <div class="sec-h" style="margin-top:18px">Personality Traits</div>
+          <div class="hint" style="margin-bottom:10px">Each trait is a left/right pairing with a 0–20 slant, plus an icon and 6-digit hex color per side.</div>
+          <div id="psyList"></div>
+          <button class="addbtn" id="addPsy">+ Add trait</button>
+        </div>
+
+        <!-- ABOUT -->
+        <div class="tabpane" data-pane="about">
+          <label class="f"><span>Template (TE)</span>
+            <div class="seg" id="teSeg" role="tablist">
+              <button data-te="1" class="on">1 — Single text</button>
+              <button data-te="2">2 — Cards</button>
+              <button data-te="3">3 — Phys / Pers / Hist</button>
+            </div>
+          </label>
+          <label class="f"><span>Background (BK) — applies to the About section only</span>
+            <div class="bgpick">
+              <div class="bgswatch" id="bgSwatch"></div>
+              <select id="BK" style="max-width:280px">
+                <option value="0">None (parchment)</option>
+                <option value="1">Default parchment</option>
+                <option value="3">Marble</option>
+                <option value="7">Parchment (tileable)</option>
+                <option value="22">Alliance</option>
+                <option value="23">Dragonflight</option>
+                <option value="24">Horde</option>
+                <option value="25">Kyrian</option>
+                <option value="29">Neutral (dark)</option>
+              </select>
+            </div>
+          </label>
+          <div class="notice">TRP3 markup renders live: headers <b>{h1}…{/h1}</b>, colors <b>{col:d24b01}…{/col}</b>, paragraphs <b>{p:c}…{/p}</b>, images <b>{img:Interface\PETBATTLES\Weather-Windy:512:3}</b>, and inline icons <b>{icon:ability_creature_cursed_01:25}</b>. Use the buttons to insert image/icon tags.</div>
+
+          <div id="te1wrap">
+            <div style="display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+              <button class="btn sm" data-insert="t1" id="t1InsertIcon">Insert icon</button>
+              <button class="btn sm" data-insert="t1" id="t1InsertImg">Insert image</button>
+              <button class="btn sm" data-insert="t1" id="t1InsertLink">Insert link</button>
+            </div>
+            <label class="f"><span>Description (TRP3 markup)</span>
+              <textarea id="T1TX" style="min-height:300px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></textarea>
+            </label>
+          </div>
+
+          <div id="te2wrap" style="display:none">
+            <div id="t2list"></div>
+            <button class="addbtn" id="addT2">+ Add card</button>
+          </div>
+
+          <div id="te3wrap" style="display:none">
+            <label class="f"><span>Physical description</span><textarea id="T3PH"></textarea></label>
+            <label class="f"><span>Personality</span><textarea id="T3PS"></textarea></label>
+            <label class="f"><span>History</span><textarea id="T3HI"></textarea></label>
+          </div>
+        </div>
+
+        <!-- MISC & TRAITS: At a Glance (5) -->
+        <div class="tabpane" data-pane="misc">
+          <div class="sec-h">At a Glance</div>
+          <div class="hint" style="margin-bottom:10px">Five quick-reference slots, each an icon. On the profile, hovering an icon shows a tooltip with its title and body. Toggle a slot on/off with its checkbox.</div>
+          <div class="glance-grid" id="glanceGrid"></div>
+          <div class="glance-edit" id="glanceEdit"></div>
+
+          <div class="sec-h" style="margin-top:18px">RP Style</div>
+          <label class="f"><span>Currently</span><textarea id="CO" style="min-height:70px" placeholder="Current status (TRP3 markup ok)…"></textarea></label>
+          <label class="f"><span>Out-of-character info</span><textarea id="CU" style="min-height:70px" placeholder="OOC notes, boundaries…"></textarea></label>
+        </div>
+
+        <!-- DATA -->
+        <div class="tabpane" data-pane="io">
+          <div class="notice">This is the profile as JSON. Press <b>Load current profile</b> to view it, <b>Copy</b> to back it up, or paste a previously copied profile and press <b>Apply</b> to restore it. The header <b>Import</b>/<b>Export JSON</b> buttons do the same via files.</div>
+          <textarea id="ioArea" class="io-area" placeholder="Profile JSON…"></textarea>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <button class="btn dark" id="ioApply">Apply</button>
+            <button class="btn" id="ioRefresh">Load current profile</button>
+            <button class="btn" id="ioCopy">Copy</button>
+          </div>
+        </div>
+
+      </div>
+      </div>
+    </section>
+
+    <!-- ============ PREVIEW ============ -->
+    <section class="panel" aria-label="Preview">
+      <h2>Live Profile Preview</h2>
+      <div class="scroll">
+        <div class="preview-shell">
+          <div class="pv-banner">
+            <div class="pv-ic" id="pvIcon"><div class="ph" style="width:100%;height:100%;display:grid;place-items:center;color:#8a724a;font-size:11px">icon</div></div>
+            <div class="pv-names">
+              <div class="pv-full" id="pvFull">Unnamed</div>
+              <div class="pv-fulltitle" id="pvFullTitle"></div>
+            </div>
+          </div>
+          <div class="pv-body">
+            <div class="pv-sub" id="pvSub" style="margin-bottom:12px"></div>
+            <div class="pv-grid" id="pvGrid"></div>
+            <div id="pvGlanceWrap"></div>
+            <div id="pvMiscWrap"></div>
+            <div id="pvPsyWrap"></div>
+            <div class="pv-h">About</div>
+            <div class="pv-about-wrap" id="pvAboutWrap"><div id="pvAbout"></div></div>
+            <div id="pvRPWrap"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ICON BROWSER MODAL -->
+<div class="modal" id="iconModal" role="dialog" aria-modal="true" aria-label="Icon browser">
+  <div class="box">
+    <h3>Icon Browser <span class="count" id="iconCount"></span><button class="x" id="iconClose">×</button></h3>
+    <div class="search">
+      <input type="text" id="iconSearch" placeholder="Search icons by name (e.g. sword, wolf, fire)…" autocomplete="off">
+      <button class="btn dark" id="iconUseTyped">Use exact name</button>
+    </div>
+    <div class="gridicons" id="iconGrid"></div>
+    <div class="foot"><span id="iconStatus"></span></div>
+  </div>
+</div>
+
+<div class="gtip" id="gtip"><div class="tt" id="gtipTitle"></div><div class="tb" id="gtipBody"></div></div>
+<div class="toast" id="toast"></div>
+<input type="file" id="fileInput" accept="application/json" style="display:none">
+
+<script>
+/* ===== RENDERER + ICON SOURCE (reused, with {icon:} + local assets) ===== */
+/* ============================================================
+   Icon source — defaults to the Wowhead CDN, but can be pointed
+   at a local folder/server so the user's installed WoW assets are
+   used instead (see "Local assets" panel). ICON_SObootstraps from
+   localStorage isn't available in artifacts, so it lives in memory.
+   ============================================================ */
+const FALLBACK_ICON = "inv_misc_questionmark";
+const ICON_SOURCES = {
+  cdn_large:  n => "https://wow.zamimg.com/images/wow/icons/large/"+n+".jpg",
+  cdn_medium: n => "https://wow.zamimg.com/images/wow/icons/medium/"+n+".jpg",
+};
+let ICON_SOURCE_MODE = "cdn_large";   // 'cdn_large' | 'cdn_medium' | 'local'
+let ICON_LOCAL_BASE  = "";            // e.g. "http://localhost:8787/icons/" or "file:///.../"
+let ICON_LOCAL_EXT   = "png";         // local extracted icons are usually png/jpg
+function trpIconUrl(name){
+  const n = String(name||FALLBACK_ICON).toLowerCase().trim();
+  if(ICON_SOURCE_MODE==="local" && ICON_LOCAL_BASE){
+    return ICON_LOCAL_BASE.replace(/\/?$/,"/")+n+"."+ICON_LOCAL_EXT;
+  }
+  return ICON_SOURCES[ICON_SOURCE_MODE] ? ICON_SOURCES[ICON_SOURCE_MODE](n)
+                                        : ICON_SOURCES.cdn_large(n);
+}
+const ICON_CDN = name => trpIconUrl(name);
+/* ============================================================
+   TRP3 markup -> HTML  (port of Utils.str.toHTML)
+   Supports: {h1..h3}{:c|:r}, {col:hex}/{col:letter}, {p}{:c|:r},
+   {img:path:W:H[:align]}, {icon:name:size}, WoW |cffRRGGBB..|r colors,
+   ![icon](size) and ![path](w,h) images.
+   WoW texture paths are resolved to public CDN PNGs (or local).
+   ============================================================ */
+const TRP_WOWTEX_BASE = "https://raw.githubusercontent.com/Gethe/wow-ui-textures/live/";
+
+// directory casing in the texture mirror differs from in-game path casing.
+const TRP_TEX_DIRMAP = {
+  "petbattles":"PetBattles", "framegeneral":"FrameGeneral", "icons":"ICONS",
+  "dialogframe":"DialogFrame", "helpframe":"HELPFRAME", "worldmap":"WorldMap",
+  "stationery":"Stationery", "achievementframe":"ACHIEVEMENTFRAME"
+};
+// exact retail-mirror filenames (some in-game names don't exist 1:1 in the mirror)
+const TRP_TEX_FILEMAP = {
+  "petbattles/weather-windy":"PetBattles/Weather-Windy",
+  "petbattles/weather-burntearth":"PetBattles/Weather-BurntEarth"
+};
+
+function trpTexUrl(path){
+  // normalise slashes, drop leading slash, drop leading "interface/"
+  let norm = String(path).replace(/\\/g,"/").replace(/^\/+/,"");
+  let parts = norm.split("/");
+  if(parts[0] && parts[0].toLowerCase()==="interface") parts.shift();
+  const key = parts.join("/").toLowerCase();
+
+  // ICONS -> sharper Wowhead icon CDN (always present)
+  if(parts[0] && parts[0].toLowerCase()==="icons"){
+    return "https://wow.zamimg.com/images/wow/icons/large/"+parts[parts.length-1].toLowerCase()+".jpg";
+  }
+  // exact known filename remaps
+  if(TRP_TEX_FILEMAP[key]) return TRP_WOWTEX_BASE+TRP_TEX_FILEMAP[key]+".PNG";
+  // generic: fix the directory segment casing, keep filename as-is
+  if(parts.length>=2){
+    const dir = parts[0].toLowerCase();
+    if(TRP_TEX_DIRMAP[dir]) parts[0]=TRP_TEX_DIRMAP[dir];
+  }
+  return TRP_WOWTEX_BASE+parts.join("/")+".PNG";
+}
+
+const TRP_COLOR_LETTER = {r:"ff0000",g:"00ff00",b:"0000ff",y:"ffff00",
+  p:"ff00ff",c:"00ffff",w:"ffffff","0":"000000",o:"ffaa00"};
+
+function trpEsc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+function renderTRP3(src){
+  if(src==null) return "";
+  let t = trpEsc(src);
+
+  // ---- block structure tags ----
+  t = t.replace(/\{h([1-3]):c\}/g,'<h$1 class="trp-h trp-c">')
+       .replace(/\{h([1-3]):r\}/g,'<h$1 class="trp-h trp-r">')
+       .replace(/\{h([1-3])\}/g,'<h$1 class="trp-h">')
+       .replace(/\{\/h1\}/g,'</h1>').replace(/\{\/h2\}/g,'</h2>').replace(/\{\/h3\}/g,'</h3>');
+
+  t = t.replace(/\{p:c\}/g,'<p class="trp-p trp-c">')
+       .replace(/\{p:r\}/g,'<p class="trp-p trp-r">')
+       .replace(/\{p\}/g,'<p class="trp-p">')
+       .replace(/\{\/p\}/g,'</p>');
+
+  // ---- images: {img:path:W:H[:align]} ----
+  // TRP3 passes width/height straight to the SimpleHTML <img> unscaled, so we
+  // render at the exact specified pixels. Wider-than-frame images overflow and
+  // are clipped by .trp-html{overflow:hidden}, matching the in-game frame.
+  t = t.replace(/\{img:([^:}]+):([^:}]+):([^:}]+)(?::([^:}]*))?\}/g,
+    function(_,path,w,h,align){
+      const a = ({c:"center",l:"left",r:"right"})[align]||"center";
+      const W = Math.abs(parseInt(w)||128), H = Math.abs(parseInt(h)||128);
+      const url = trpTexUrl(path);
+      const cls = a==="left"?"trp-img-l":a==="right"?"trp-img-r":"trp-img-c";
+      return '<img class="trp-img '+cls+'" src="'+url+'" '+
+        'width="'+W+'" height="'+H+'" style="width:'+W+'px;height:'+H+'px" '+
+        'onerror="this.style.display=\'none\'" alt="">';
+    });
+
+  // ---- links ----
+  // TRP3 default link color is bright green (00ff00), UNLESS the link is
+  // immediately preceded by a {col:...} tag (then the author's color wins).
+  // Forms: {link*url*{icon:...}}, {link*url*text}, and markdown [text](url).
+  // Run before the {icon:} pass so embedded-icon links keep their inner tag.
+  const LINK_GREEN = "00ff00";
+  function precededByCol(str, idx){
+    const pre = str.slice(0, idx);
+    return /\{col:[0-9a-fA-F]{6}\}$/.test(pre) || /\{col:[a-z0]\}$/.test(pre);
+  }
+  function makeLink(url, text, idx, whole){
+    const inner = precededByCol(whole, idx) ? text : '<span style="color:#'+LINK_GREEN+'">'+text+'</span>';
+    return '<a href="'+String(url).replace(/"/g,"&quot;")+'" target="_blank" rel="noopener noreferrer" class="trp-link">'+inner+'</a>';
+  }
+  // markdown links [text](url) first (TRP3 order). Negative lookbehind on '!'
+  // so image markdown ![icon](size) is left for the image pass.
+  t = t.replace(/(^|[^!])\[([^\]]*)\]\(([^)]*)\)/g, function(m,pre,text,url,idx){
+    return pre+makeLink(url,text,idx+pre.length,t); });
+  // embedded-icon link (text is a {icon:...} tag, converted by the later icon pass)
+  t = t.replace(/\{link\*([^*]+)\*(\{icon:[^}]+\})\}/g, function(m,url,text,idx){ return makeLink(url,text,idx,t); });
+  // plain link tag: url up to first '*', text up to '}'
+  t = t.replace(/\{link\*([^*]+)\*([^}]+)\}/g, function(m,url,text,idx){ return makeLink(url,text,idx,t); });
+
+  // ---- {icon:name:size} inline icon (single square measurement) ----
+  t = t.replace(/\{icon:([^:}]+):(\d+)\}/g,function(_,name,size){
+    const s = Math.abs(parseInt(size))||25;
+    return '<img class="trp-icon" src="'+trpIconUrl(name)+'" '+
+      'style="width:'+s+'px;height:'+s+'px" '+
+      'onerror="this.onerror=null;this.src=\''+trpIconUrl(FALLBACK_ICON)+'\'" alt="'+name+'">';
+  });
+
+  // ---- markdown-ish ![icon](size) / ![path](w,h) ----
+  t = t.replace(/!\[([^\]]+)\]\(([^)]+)\)/g,function(_,icon,size){
+    if(icon.indexOf("\\")>=0 || icon.indexOf("/")>=0){
+      let w,h; if(size.indexOf(",")>=0){[w,h]=size.split(",");} else {w=h=size;}
+      return '<img class="trp-img trp-img-c" src="'+trpTexUrl(icon)+'" '+
+        'style="width:'+(Math.abs(parseInt(w))||128)+'px;height:'+(Math.abs(parseInt(h))||128)+'px" '+
+        'onerror="this.style.display=\'none\'" alt="">';
+    }
+    const s = parseInt(size)||25;
+    return '<img class="trp-icon" src="'+trpIconUrl(icon)+'" style="width:'+s+'px;height:'+s+'px" alt="">';
+  });
+
+  // ---- colors ----
+  // {col:hexhex} ... {/col}  -> span (handle nesting by simple stack rewrite)
+  t = t.replace(/\{col:([0-9a-fA-F]{6})\}/g,'<span style="color:#$1">')
+       .replace(/\{col:([a-z0])\}/g,function(_,l){
+          return '<span style="color:#'+(TRP_COLOR_LETTER[l]||"ffffff")+'">';})
+       .replace(/\{\/col\}/g,'</span>');
+
+  // WoW inline color escapes |cffRRGGBB ... |r
+  t = t.replace(/\|c[fF][fF]([0-9a-fA-F]{6})/g,'<span style="color:#$1">')
+       .replace(/\|r/g,'</span>');
+
+  // ---- newlines: turn blank lines into paragraph breaks, single into <br> ----
+  // but don't inject <br> right around block tags
+  // first, collapse newlines adjacent to block elements
+  t = t.replace(/\n(?=<(h[1-3]|p|img|\/p|\/h))/g,"")
+       .replace(/(<\/(h[1-3]|p)>|<img[^>]*>)\n/g,"$1");
+  t = t.replace(/\n/g,"<br>");
+
+  return '<div class="trp-html">'+t+'</div>';
+}
+/* ===== TRP3 background index -> texture (mirror casing) ===== */
+const TRP_BG_BASE = "https://raw.githubusercontent.com/Gethe/wow-ui-textures/live/";
+const TRP_BACKGROUNDS = {
+  0:{n:"None",u:""},
+  1:{n:"Default parchment",u:"DialogFrame/UI-DialogBox-Background"},
+  3:{n:"Marble",u:"FrameGeneral/UI-Background-Marble"},
+  7:{n:"Parchment (tileable)",u:"HELPFRAME/Tileable-Parchment"},
+  22:{n:"Alliance",u:"FrameGeneral/UIFrameAllianceBackground"},
+  23:{n:"Dragonflight",u:"FrameGeneral/UIFrameNeutralBackground",dark:true},
+  24:{n:"Horde",u:"FrameGeneral/UIFrameHordeBackground",dark:true},
+  25:{n:"Kyrian",u:"FrameGeneral/UIFrameKyrianBackground",dark:true},
+  29:{n:"Neutral",u:"FrameGeneral/UIFrameNeutralBackground",dark:true}
+};
+function trpBgUrl(idx){ const b=TRP_BACKGROUNDS[idx]; return (b&&b.u)?TRP_BG_BASE+b.u+".PNG":""; }
+function trpBgIsDark(idx){ const b=TRP_BACKGROUNDS[idx]; return !!(b&&b.dark); }
+
+/* ===== helpers ===== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),1900);}
+function setStatus(m){ $("iconStatus").textContent=m; }
+function iconImg(name){ const n=name&&name.length?name:FALLBACK_ICON;
+  return '<img loading="lazy" src="'+trpIconUrl(n)+'" alt="'+esc(n)+'" onerror="this.onerror=null;this.src=\''+trpIconUrl(FALLBACK_ICON)+'\'">'; }
+const hexOk = h => /^[0-9a-fA-F]{6}$/.test(h);
+
+/* ===== state — native TRP3 shape =====
+   characteristics: + CH (class color hex), PE (glance, 5 slots), PS traits with LC/RC colors + LI/RI icons + VA 0..20
+*/
+function blankProfile(){
+  return { player:{
+    characteristics:{ v:1, IC:"", TI:"", FN:"", LN:"", FT:"", RA:"", CL:"", CH:"e57d3a",
+      AG:"", EC:"", HE:"", WE:"", BP:"", RE:"",
+      PS:[], MI:[],
+      PE:{ "1":glanceBlank(),"2":glanceBlank(),"3":glanceBlank(),"4":glanceBlank(),"5":glanceBlank() } },
+    about:{ v:1, TE:1, BK:0, T1:{TX:""}, T2:[], T3:{PH:{TX:""},PS:{TX:""},HI:{TX:""}} },
+    misc:{ v:1, CO:"", CU:"" }
+  }};
+}
+function glanceBlank(){ return {AC:false, IC:"inv_misc_questionmark", TI:"", TX:""}; }
+let P = blankProfile();
+const C = ()=>P.player.characteristics;
+const A = ()=>P.player.about;
+
+/* ===== datalists ===== */
+RACES.forEach(r=>{const o=document.createElement("option");o.value=r;$("raceList").appendChild(o);});
+CLASSES.forEach(c=>{const o=document.createElement("option");o.value=c;$("classList").appendChild(o);});
+
+/* ===== TABS ===== */
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".tabpane").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  document.querySelector('[data-pane="'+t.dataset.tab+'"]').classList.add("active");
+  if(t.dataset.tab==="io") refreshIO();
+});
+
+/* ===== ICON BROWSER ===== */
+let FULL_ICONS=null, FULL_TRIED=false;
+const ICON_INDEX = BUNDLED_ICONS.slice();
+async function ensureFullIcons(){
+  if(FULL_ICONS||FULL_TRIED) return; FULL_TRIED=true;
+  try{ const r=await fetch("trp3-icons.json",{cache:"force-cache"});
+    if(r.ok){ FULL_ICONS=await r.json(); } }catch(e){}
+}
+let iconTargetSetter=null;
+const modal=$("iconModal");
+function openIconBrowser(setter){ iconTargetSetter=setter; modal.classList.add("open");
+  $("iconSearch").value=""; ensureFullIcons().then(()=>renderIconGrid("")); renderIconGrid("");
+  setTimeout(()=>$("iconSearch").focus(),50); }
+function closeIconBrowser(){ modal.classList.remove("open"); iconTargetSetter=null; }
+$("iconClose").onclick=closeIconBrowser;
+modal.addEventListener("click",e=>{ if(e.target===modal) closeIconBrowser(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ closeIconBrowser(); }});
+let searchTimer=null;
+$("iconSearch").addEventListener("input",e=>{ clearTimeout(searchTimer);
+  searchTimer=setTimeout(()=>renderIconGrid(e.target.value.trim().toLowerCase()),140); });
+$("iconUseTyped").onclick=()=>{ const v=$("iconSearch").value.trim().toLowerCase();
+  if(!v){toast("Type an icon name");return;} if(iconTargetSetter) iconTargetSetter(v); closeIconBrowser(); };
+function renderIconGrid(q){
+  const grid=$("iconGrid"); grid.innerHTML="";
+  const source=FULL_ICONS||ICON_INDEX; let list;
+  if(!q){ list=ICON_INDEX.slice(0,300); }
+  else { list=[]; for(let i=0;i<source.length&&list.length<400;i++) if(source[i].indexOf(q)!==-1) list.push(source[i]); }
+  const total=(FULL_ICONS?FULL_ICONS.length:ICON_INDEX.length);
+  $("iconCount").textContent=total.toLocaleString()+" icons";
+  if(!list.length){ grid.innerHTML='<div style="grid-column:1/-1;color:#8a724a;font-style:italic;padding:10px">No bundled match. Press <b>Use exact name</b> to apply “'+esc(q)+'”.</div>';
+    setStatus("Exact names always work."); return; }
+  const frag=document.createDocumentFragment();
+  list.forEach(name=>{ const b=document.createElement("button"); b.className="gicon"; b.title=name;
+    b.innerHTML=iconImg(name); b.onclick=()=>{ if(iconTargetSetter) iconTargetSetter(name); closeIconBrowser(); };
+    frag.appendChild(b); });
+  grid.appendChild(frag);
+  setStatus(q?("Matches for “"+q+"”"+(FULL_ICONS?"":" — load trp3-icons.json for all")):"Featured icons. Type to search.");
+}
+function wireIconButton(btn,getName,setName){
+  btn.onclick=()=>openIconBrowser(name=>{ setName(name); paintIconButton(btn,name); sync(); });
+}
+function paintIconButton(btn,name){ btn.innerHTML=name&&name.length?iconImg(name):'<span class="ph">icon</span>'; }
+
+/* ===== character fields ===== */
+["TI","FN","LN","FT","RA","CL","AG","EC","HE","WE","BP","RE"].forEach(k=>{
+  $(k).addEventListener("input",()=>{ C()[k]=$(k).value; sync(); });
+});
+wireIconButton($("charIconBtn"), ()=>C().IC, n=>C().IC=n);
+// class color (color input + hex text, two-way)
+$("CHcolor").addEventListener("input",()=>{ const h=$("CHcolor").value.replace("#",""); C().CH=h; $("CHcolorHex").value=h; sync(); });
+$("CHcolorHex").addEventListener("input",()=>{ let h=$("CHcolorHex").value.replace(/[^0-9a-fA-F]/g,"").slice(0,6);
+  $("CHcolorHex").value=h; if(hexOk(h)){ C().CH=h; $("CHcolor").value="#"+h; sync(); } });
+
+/* ===== PERSONALITY TRAITS (0..20, icon+hex per side) ===== */
+function renderPsyEditor(){
+  const wrap=$("psyList"); wrap.innerHTML="";
+  C().PS.forEach((p,i)=>{
+    if(p.VA==null) p.VA=10;
+    const d=document.createElement("div"); d.className="card";
+    d.innerHTML=
+      '<button class="del">remove</button>'+
+      '<div class="psylabels">'+
+        '<label class="f" style="margin:0"><span>Left trait</span><input data-f="LT" type="text" value="'+esc(p.LT)+'"></label>'+
+        '<label class="f" style="margin:0"><span>Right trait</span><input data-f="RT" type="text" value="'+esc(p.RT)+'"></label>'+
+      '</div>'+
+      '<div class="psyrow">'+
+        '<div class="psyend"><button class="iconbtn li"></button>'+
+          '<input type="color" class="lc" value="#'+(hexOk(p.LC)?p.LC:"7a2d12")+'">'+
+          '<input type="text" class="lchex psyhex" maxlength="6" value="'+(hexOk(p.LC)?p.LC:"7a2d12")+'" placeholder="ffba1e"></div>'+
+        '<input class="slider" type="range" min="0" max="20" value="'+p.VA+'">'+
+        '<div class="psyend r"><input type="text" class="rchex psyhex" maxlength="6" value="'+(hexOk(p.RC)?p.RC:"3f6b2e")+'" placeholder="ffba1e">'+
+          '<input type="color" class="rc" value="#'+(hexOk(p.RC)?p.RC:"3f6b2e")+'">'+
+          '<button class="iconbtn ri"></button></div>'+
+      '</div>'+
+      '<div style="display:flex;justify-content:center;margin-top:8px">'+
+        '<input class="psynum" type="text" inputmode="numeric" value="'+p.VA+'" title="0–20"></div>';
+    // wire
+    d.querySelector('.del').onclick=()=>{ C().PS.splice(i,1); renderPsyEditor(); sync(); };
+    d.querySelectorAll('input[data-f]').forEach(inp=>inp.addEventListener("input",()=>{ p[inp.dataset.f]=inp.value; sync(); }));
+    const slider=d.querySelector('.slider'), num=d.querySelector('.psynum');
+    function setVA(v){ v=Math.max(0,Math.min(20,Math.round(+v||0))); p.VA=v; slider.value=v; num.value=v; sync(); }
+    slider.addEventListener("input",()=>setVA(slider.value));
+    num.addEventListener("input",()=>{ num.value=num.value.replace(/[^0-9]/g,""); });
+    num.addEventListener("change",()=>setVA(num.value));
+    const li=d.querySelector('.li'), ri=d.querySelector('.ri');
+    paintIconButton(li,p.LI); paintIconButton(ri,p.RI);
+    wireIconButton(li,()=>p.LI,n=>p.LI=n); wireIconButton(ri,()=>p.RI,n=>p.RI=n);
+    const lc=d.querySelector('.lc'), rc=d.querySelector('.rc'),
+          lchex=d.querySelector('.lchex'), rchex=d.querySelector('.rchex');
+    lc.addEventListener("input",e=>{ const h=e.target.value.replace("#",""); p.LC=h; lchex.value=h; sync(); });
+    rc.addEventListener("input",e=>{ const h=e.target.value.replace("#",""); p.RC=h; rchex.value=h; sync(); });
+    lchex.addEventListener("input",()=>{ let h=lchex.value.replace(/[^0-9a-fA-F]/g,"").slice(0,6); lchex.value=h;
+      if(hexOk(h)){ p.LC=h; lc.value="#"+h; sync(); } });
+    rchex.addEventListener("input",()=>{ let h=rchex.value.replace(/[^0-9a-fA-F]/g,"").slice(0,6); rchex.value=h;
+      if(hexOk(h)){ p.RC=h; rc.value="#"+h; sync(); } });
+    wrap.appendChild(d);
+  });
+}
+$("addPsy").onclick=()=>{
+  const used=C().PS.length, pre=PSYCHO_PRESETS[used%PSYCHO_PRESETS.length];
+  C().PS.push({LT:pre.lt,RT:pre.rt,VA:10,LC:"7a2d12",RC:"3f6b2e",LI:"inv_misc_questionmark",RI:"inv_misc_questionmark"});
+  renderPsyEditor(); sync();
+};
+
+/* ===== ADDITIONAL INFORMATION (MI) — in Characteristics ===== */
+function renderMiscEditor(){
+  const wrap=$("miscList"); wrap.innerHTML="";
+  C().MI.forEach((m,i)=>{
+    const d=document.createElement("div"); d.className="card";
+    d.innerHTML='<button class="del">remove</button>'+
+      '<div class="iconpick" style="margin-bottom:10px">'+
+        '<button class="iconbtn mi-ic" style="width:46px;height:46px"></button>'+
+        '<div class="row" style="flex:1">'+
+          '<label class="f" style="margin:0"><span>Label</span><input data-f="NA" type="text" value="'+esc(m.NA)+'" placeholder="e.g. Pronouns"></label>'+
+          '<label class="f" style="margin:0"><span>Value</span><input data-f="VA" type="text" value="'+esc(m.VA)+'" placeholder="e.g. she/her"></label>'+
+        '</div></div>';
+    const ic=d.querySelector('.mi-ic'); paintIconButton(ic,m.IC); wireIconButton(ic,()=>m.IC,n=>m.IC=n);
+    d.querySelector('.del').onclick=()=>{ C().MI.splice(i,1); renderMiscEditor(); sync(); };
+    d.querySelectorAll('input[data-f]').forEach(inp=>inp.addEventListener("input",()=>{ m[inp.dataset.f]=inp.value; sync(); }));
+    wrap.appendChild(d);
+  });
+}
+$("addMisc").onclick=()=>{ C().MI.push({IC:"inv_misc_note_05",NA:"",VA:""}); renderMiscEditor(); sync(); };
+
+/* ===== AT A GLANCE (PE, 5 slots) — in Misc & Traits ===== */
+function renderGlanceEditor(){
+  const grid=$("glanceGrid"), edit=$("glanceEdit");
+  grid.innerHTML=""; edit.innerHTML="";
+  for(let s=1;s<=5;s++){
+    const g=C().PE[String(s)]||(C().PE[String(s)]=glanceBlank());
+    const slot=document.createElement("div"); slot.className="glance-slot"+(g.AC?"":" off");
+    slot.innerHTML='<button class="iconbtn"></button><small>'+(g.AC?(esc(g.TI)||("Slot "+s)):"off")+'</small>';
+    const ic=slot.querySelector('.iconbtn'); paintIconButton(ic,g.IC); wireIconButton(ic,()=>g.IC,n=>{g.IC=n;});
+    grid.appendChild(slot);
+
+    const card=document.createElement("div"); card.className="card";
+    card.innerHTML=
+      '<label class="glance-toggle" style="margin-bottom:8px"><input type="checkbox" class="ac" '+(g.AC?"checked":"")+'> Slot '+s+' enabled</label>'+
+      '<div class="row">'+
+        '<label class="f" style="margin:0"><span>Title</span><input class="ti" type="text" value="'+esc(g.TI)+'" placeholder="e.g. Mood"></label>'+
+        '<label class="f" style="margin:0"><span>Body</span><input class="tx" type="text" value="'+esc(g.TX)+'" placeholder="Tooltip text"></label>'+
+      '</div>';
+    card.querySelector('.ac').addEventListener("change",e=>{ g.AC=e.target.checked; renderGlanceEditor(); sync(); });
+    card.querySelector('.ti').addEventListener("input",e=>{ g.TI=e.target.value; sync(); });
+    card.querySelector('.tx').addEventListener("input",e=>{ g.TX=e.target.value; sync(); });
+    edit.appendChild(card);
+  }
+}
+
+/* ===== ABOUT ===== */
+function setTE(te){ A().TE=te;
+  document.querySelectorAll("#teSeg button").forEach(b=>b.classList.toggle("on",+b.dataset.te===te));
+  $("te1wrap").style.display=te===1?"block":"none";
+  $("te2wrap").style.display=te===2?"block":"none";
+  $("te3wrap").style.display=te===3?"block":"none"; sync(); }
+document.querySelectorAll("#teSeg button").forEach(b=>b.onclick=()=>setTE(+b.dataset.te));
+$("T1TX").addEventListener("input",()=>{ A().T1.TX=$("T1TX").value; sync(); });
+["PH","PS","HI"].forEach(k=>$("T3"+k).addEventListener("input",()=>{ A().T3[k].TX=$("T3"+k).value; sync(); }));
+function insertAtCursor(ta, text){
+  const s=ta.selectionStart||0, e=ta.selectionEnd||0;
+  ta.value=ta.value.slice(0,s)+text+ta.value.slice(e);
+  ta.selectionStart=ta.selectionEnd=s+text.length; ta.dispatchEvent(new Event("input"));
+  ta.focus();
+}
+$("t1InsertIcon").onclick=()=>openIconBrowser(name=>insertAtCursor($("T1TX"),"{icon:"+name+":25}"));
+$("t1InsertImg").onclick=()=>openIconBrowser(name=>insertAtCursor($("T1TX"),"{img:Interface\\ICONS\\"+name+":64:64}"));
+$("t1InsertLink").onclick=()=>{ const url=prompt("Link URL:","https://"); if(url==null) return;
+  const text=prompt("Link text:","")||url; insertAtCursor($("T1TX"),"{link*"+url+"*"+text+"}"); };
+function paintBgSwatch(idx){ const url=trpBgUrl(idx), sw=$("bgSwatch");
+  if(url) sw.style.backgroundImage="url('"+url+"')"; else { sw.style.backgroundImage=""; } }
+$("BK").addEventListener("change",()=>{ A().BK=+$("BK").value; paintBgSwatch(A().BK); sync(); });
+function renderT2Editor(){
+  const wrap=$("t2list"); wrap.innerHTML="";
+  A().T2.forEach((c,i)=>{
+    const d=document.createElement("div"); d.className="card";
+    d.innerHTML='<button class="del">remove</button>'+
+      '<div class="iconpick" style="margin-bottom:10px"><button class="iconbtn t2-ic" style="width:46px;height:46px"></button>'+
+      '<div style="flex:1" class="hint">Card icon + text</div></div>'+
+      '<textarea data-f="TX">'+esc(c.TX)+'</textarea>';
+    const ic=d.querySelector('.t2-ic'); paintIconButton(ic,c.IC); wireIconButton(ic,()=>c.IC,n=>c.IC=n);
+    d.querySelector('.del').onclick=()=>{ A().T2.splice(i,1); renderT2Editor(); sync(); };
+    d.querySelector('textarea').addEventListener("input",e=>{ c.TX=e.target.value; sync(); });
+    wrap.appendChild(d);
+  });
+}
+$("addT2").onclick=()=>{ A().T2.push({IC:"inv_misc_book_09",TX:""}); renderT2Editor(); sync(); };
+$("CO").addEventListener("input",()=>{ P.player.misc.CO=$("CO").value; sync(); });
+$("CU").addEventListener("input",()=>{ P.player.misc.CU=$("CU").value; sync(); });
+
+/* ===== PREVIEW ===== */
+function fullName(){ const c=C(); return [c.FN,c.LN].filter(Boolean).join(" ")||"Unnamed"; }
+function renderPreview(){
+  const c=C();
+  $("pvIcon").innerHTML = c.IC?iconImg(c.IC):'<div class="ph" style="width:100%;height:100%;display:grid;place-items:center;color:#8a724a;font-size:11px">icon</div>';
+  // name at top, full title below name
+  $("pvFull").textContent=(c.TI?c.TI+" ":"")+fullName();
+  $("pvFullTitle").textContent=c.FT||"";
+  // race + class below full title field, class tinted by CH
+  const clsColor = hexOk(c.CH)?("#"+c.CH):"#e57d3a";
+  const sub=$("pvSub"); sub.innerHTML="";
+  const bits=[];
+  if(c.RA) bits.push('<span style="color:#333333">'+esc(c.RA)+'</span>');
+  if(c.CL) bits.push('<span style="color:'+clsColor+'">'+esc(c.CL)+'</span>');
+  sub.innerHTML=bits.join('<span style="color:#9a8a6a"> · </span>');
+
+  // characteristics grid (race/class shown above via sub; details here)
+  const rows=[["Age",c.AG],["Eyes",c.EC],["Height",c.HE],["Build",c.WE],["Birthplace",c.BP],["Residence",c.RE]];
+  const g=$("pvGrid"); g.innerHTML="";
+  rows.filter(r=>r[1]).forEach(([k,v])=>{ const d=document.createElement("div"); d.className="pv-field";
+    d.innerHTML='<div class="pv-k">'+esc(k)+'</div><div class="pv-v">'+esc(v)+'</div>'; g.appendChild(d); });
+
+  // At a glance row
+  const gw=$("pvGlanceWrap"); const active=[];
+  for(let s=1;s<=5;s++){ const gd=C().PE[String(s)]; if(gd&&gd.AC) active.push(gd); }
+  if(active.length){
+    let h='<div class="pv-h">At a Glance</div><div class="pv-glance">';
+    active.forEach((gd,idx)=>{ h+='<div class="g" data-gi="'+idx+'">'+iconImg(gd.IC)+'</div>'; });
+    h+='</div>'; gw.innerHTML=h;
+    // tooltip wiring
+    const tips=active;
+    gw.querySelectorAll('.g').forEach((el,idx)=>{
+      el.addEventListener("mouseenter",ev=>showGTip(ev,tips[idx]));
+      el.addEventListener("mousemove",moveGTip);
+      el.addEventListener("mouseleave",hideGTip);
+    });
+  } else gw.innerHTML="";
+
+  // misc / additional information
+  const mw=$("pvMiscWrap");
+  if(c.MI.length){ let h='<div class="pv-h">Additional Information</div>';
+    c.MI.forEach(m=>{ h+='<div class="pv-misc">'+iconImg(m.IC)+'<b>'+esc(m.NA||"—")+'</b><span>'+esc(m.VA||"")+'</span></div>'; });
+    mw.innerHTML=h; } else mw.innerHTML="";
+
+  // personality
+  const pw=$("pvPsyWrap");
+  if(c.PS.length){ let h='<div class="pv-h">Personality</div>';
+    c.PS.forEach(p=>{ const v=p.VA==null?10:p.VA; const pct=(v/20)*100;
+      const c1=hexOk(p.LC)?("#"+p.LC):"#7a2d12", c2=hexOk(p.RC)?("#"+p.RC):"#3f6b2e";
+      h+='<div class="pv-psy"><div class="lab">'+
+         '<span class="side">'+(p.LI?'<img src="'+trpIconUrl(p.LI)+'">':'')+esc(p.LT||"—")+'</span>'+
+         '<span class="side">'+esc(p.RT||"—")+(p.RI?'<img src="'+trpIconUrl(p.RI)+'">':'')+'</span></div>'+
+         '<div class="pv-bar" style="--c1:'+c1+';--c2:'+c2+'"><i style="left:'+pct+'%"></i></div></div>';
+    });
+    pw.innerHTML=h; } else pw.innerHTML="";
+
+  // about — rendered markup; background applied to the About wrapper ONLY
+  const ab=$("pvAbout"); const a=A(); let h="";
+  if(a.TE===1){ h=a.T1.TX?renderTRP3(a.T1.TX):'<div class="pv-empty">No description yet.</div>'; }
+  else if(a.TE===2){ if(a.T2.length&&a.T2.some(x=>x.TX)){ a.T2.forEach(x=>{ if(x.TX) h+='<div class="card" style="display:flex;gap:10px;background:rgba(255,255,255,.5)">'+iconImg(x.IC)+'<div style="flex:1">'+renderTRP3(x.TX)+'</div></div>'; }); } else h='<div class="pv-empty">No cards yet.</div>'; }
+  else { const parts=[["Physical",a.T3.PH.TX],["Personality",a.T3.PS.TX],["History",a.T3.HI.TX]];
+    if(parts.some(x=>x[1])){ parts.forEach(([k,v])=>{ if(v) h+='<div style="margin-bottom:12px"><div class="pv-k" style="margin-bottom:3px">'+k+'</div>'+renderTRP3(v)+'</div>'; }); } else h='<div class="pv-empty">No sections filled in yet.</div>'; }
+  ab.innerHTML=h;
+  applyAboutBackground(a.BK||0);
+
+  // Currently & Out of Character render OUTSIDE the About background, on default parchment
+  let rp="";
+  if(P.player.misc.CO) rp+='<div class="pv-h">Currently</div>'+renderTRP3(P.player.misc.CO);
+  if(P.player.misc.CU) rp+='<div class="pv-h">Out of Character</div>'+renderTRP3(P.player.misc.CU);
+  $("pvRPWrap").innerHTML=rp;
+}
+function applyAboutBackground(idx){
+  const wrap=$("pvAboutWrap"); if(!wrap) return;
+  const url=trpBgUrl(idx), dark=trpBgIsDark(idx);
+  if(url){
+    const wash=dark?"linear-gradient(rgba(20,13,7,.80),rgba(20,13,7,.80)),":"linear-gradient(rgba(244,238,212,.30),rgba(244,238,212,.30)),";
+    wrap.style.backgroundImage=wash+"url('"+url+"')";
+    wrap.style.backgroundRepeat="repeat"; wrap.style.backgroundSize="auto, 256px";
+    wrap.style.backgroundColor="#160f08";
+  } else { wrap.style.backgroundImage=""; wrap.style.backgroundColor="#efe3c5"; }
+  wrap.classList.toggle("bg-dark", dark);
+}
+
+/* glance tooltip */
+function showGTip(ev,gd){ const t=$("gtip");
+  $("gtipTitle").innerHTML='<img src="'+trpIconUrl(gd.IC)+'">'+esc(gd.TI||"");
+  $("gtipBody").textContent=gd.TX||""; t.classList.add("show"); moveGTip(ev); }
+function moveGTip(ev){ const t=$("gtip"); let x=ev.clientX+14, y=ev.clientY+14;
+  const r=t.getBoundingClientRect(); if(x+r.width>window.innerWidth) x=ev.clientX-r.width-14;
+  if(y+r.height>window.innerHeight) y=ev.clientY-r.height-14; t.style.left=x+"px"; t.style.top=y+"px"; }
+function hideGTip(){ $("gtip").classList.remove("show"); }
+
+function sync(){ renderPreview(); }
+
+/* ===== load state into form ===== */
+function loadFormFromState(){
+  const c=C();
+  ["TI","FN","LN","FT","RA","CL","AG","EC","HE","WE","BP","RE"].forEach(k=>$(k).value=c[k]||"");
+  $("CHcolorHex").value=hexOk(c.CH)?c.CH:"e57d3a"; $("CHcolor").value="#"+(hexOk(c.CH)?c.CH:"e57d3a");
+  paintIconButton($("charIconBtn"),c.IC);
+  renderMiscEditor(); renderPsyEditor(); renderGlanceEditor();
+  const a=A();
+  $("T1TX").value=a.T1.TX||""; $("T3PH").value=a.T3.PH.TX||""; $("T3PS").value=a.T3.PS.TX||""; $("T3HI").value=a.T3.HI.TX||"";
+  $("BK").value=String(a.BK||0); paintBgSwatch(a.BK||0);
+  renderT2Editor(); setTE(a.TE||1);
+  $("CO").value=P.player.misc.CO||""; $("CU").value=P.player.misc.CU||"";
+  sync();
+}
+
+/* ===== import / export ===== */
+function refreshIO(){ $("ioArea").value=JSON.stringify(P,null,2); }
+$("ioRefresh").onclick=()=>{ refreshIO(); toast("Refreshed"); };
+$("ioCopy").onclick=()=>{ refreshIO(); navigator.clipboard?.writeText($("ioArea").value).then(()=>toast("Copied"),()=>toast("Select & copy")); };
+/* Returns true if it's safe to replace the whole UI/profile. Prompts only when
+   there is existing work that would be lost. Used by every clear/replace action. */
+function profileHasContent(){
+  const c=C(), a=A(), m=P.player.misc;
+  if(c.FN||c.LN||c.TI||c.FT||c.RA||c.CL||c.AG||c.EC||c.HE||c.WE||c.BP||c.RE||c.IC) return true;
+  if((c.PS&&c.PS.length)||(c.MI&&c.MI.length)) return true;
+  if(c.PE){ for(let s=1;s<=5;s++){ const g=c.PE[String(s)]; if(g&&(g.AC||g.TI||g.TX)) return true; } }
+  if(a.T1.TX||a.T3.PH.TX||a.T3.PS.TX||a.T3.HI.TX||(a.T2&&a.T2.length)) return true;
+  if(m.CO||m.CU) return true;
+  return false;
+}
+function confirmClear(actionLabel){
+  if(!profileHasContent()) return true;
+  return confirm(actionLabel+"\n\nThis will replace everything currently in the editor. Your unsaved work will be lost. Continue?");
+}
+
+$("ioApply").onclick=()=>{
+  if(!confirmClear("Apply the pasted data?")) return;
+  try{ P=normalize(JSON.parse($("ioArea").value)); loadFormFromState(); toast("Applied"); }
+  catch(e){ toast("Invalid JSON: "+(e.message||"couldn't parse")); }
+};
+$("btnExport").onclick=()=>{ refreshIO(); const name=(fullName()||"profile").replace(/[^a-z0-9]+/gi,"_");
+  const blob=new Blob([JSON.stringify(P,null,2)],{type:"application/json"}); const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="TRP3_"+name+".json"; a.click(); URL.revokeObjectURL(a.href); toast("Exported "+a.download); };
+$("btnImport").onclick=()=>$("fileInput").click();
+$("fileInput").addEventListener("change",e=>{ const f=e.target.files[0]; if(!f)return;
+  if(!confirmClear("Import \""+f.name+"\"?")){ e.target.value=""; return; }
+  const r=new FileReader();
+  r.onload=()=>{ try{ P=normalize(JSON.parse(r.result)); loadFormFromState(); toast("Imported "+f.name);}
+    catch(err){ toast("Couldn't read that file: "+(err.message||"invalid JSON"));} };
+  r.readAsText(f); e.target.value=""; });
+$("btnNew").onclick=()=>{ if(confirm("Start a new blank profile?")){ P=blankProfile(); loadFormFromState(); toast("New profile"); } };
+
+function normalize(obj){
+  const base=blankProfile();
+  const src=obj&&obj.player?obj:{player:obj||{}};
+  const sc=(src.player&&src.player.characteristics)||{};
+  Object.assign(base.player.characteristics, sc);
+  const bc=base.player.characteristics;
+  bc.CH = hexOk((sc.CH||"").replace("#",""))?sc.CH.replace("#",""):"e57d3a";
+  bc.PS = Array.isArray(sc.PS)?sc.PS.map(p=>({LT:p.LT||"",RT:p.RT||"",VA:Math.max(0,Math.min(20,p.VA==null?10:+p.VA)),
+      LC:hexOk((p.LC||"").replace("#",""))?p.LC.replace("#",""):"7a2d12",
+      RC:hexOk((p.RC||"").replace("#",""))?p.RC.replace("#",""):"3f6b2e",
+      LI:p.LI||"inv_misc_questionmark",RI:p.RI||"inv_misc_questionmark"})):[];
+  bc.MI = Array.isArray(sc.MI)?sc.MI.map(m=>({IC:m.IC||"",NA:m.NA||"",VA:m.VA||""})):[];
+  bc.PE = {}; for(let s=1;s<=5;s++){ const g=(sc.PE&&sc.PE[String(s)])||{};
+    bc.PE[String(s)]={AC:!!g.AC,IC:g.IC||"inv_misc_questionmark",TI:g.TI||"",TX:g.TX||""}; }
+  const sa=(src.player&&src.player.about)||{};
+  base.player.about.TE=sa.TE||1; base.player.about.BK=sa.BK||0;
+  if(sa.T1) base.player.about.T1.TX=sa.T1.TX||"";
+  base.player.about.T2=Array.isArray(sa.T2)?sa.T2.map(x=>({IC:x.IC||"",TX:x.TX||""})):[];
+  if(sa.T3) ["PH","PS","HI"].forEach(k=>{ if(sa.T3[k]) base.player.about.T3[k].TX=sa.T3[k].TX||""; });
+  const sm=(src.player&&src.player.misc)||{};
+  base.player.misc.CO=sm.CO||""; base.player.misc.CU=sm.CU||"";
+  return base;
+}
+
+/* ===== SAMPLE ===== */
+$("btnSample").onclick=()=>{ if(!confirmClear("Load the sample profile?")) return; P=SAMPLE_PROFILE(); loadFormFromState(); toast("Loaded sample: Baern Ironmantle"); };
+
+/* boot */
+loadFormFromState();
+ensureFullIcons();
+
+</script>
+</body>
+</html>
