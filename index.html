@@ -409,7 +409,10 @@ function SAMPLE_PROFILE(){ return { player:{
                 <option value="28">28. Muted Plum</option>
                 <option value="29">29. Deep Teal</option>
                 <option value="30">30. Emerald Shade</option>
+                <option value="custom">31. Custom color…</option>
               </select>
+              <input type="color" id="BKcustom" value="#2b2f2c" style="display:none">
+              <input type="text" id="BKcustomHex" maxlength="6" placeholder="rrggbb" style="width:96px;display:none">
             </div>
           </label>
           <div class="notice">TRP3 markup renders live: headers <b>{h1}…{/h1}</b>, colors <b>{col:d24b01}…{/col}</b>, paragraphs <b>{p:c}…{/p}</b>, images <b>{img:Interface\PETBATTLES\Weather-Windy:512:3}</b>, and inline icons <b>{icon:ability_creature_cursed_01:25}</b>. Use the buttons to insert image/icon tags.</div>
@@ -737,8 +740,17 @@ const TRP_BACKGROUNDS = {
   29:{n:"Deep Teal",c:"#324c4c",dark:true},
   30:{n:"Emerald Shade",c:"#2e473b",dark:true},
 };
-function trpBgColor(idx){ const b=TRP_BACKGROUNDS[idx]; return (b&&b.c)?b.c:""; }
-function trpBgIsDark(idx){ const b=TRP_BACKGROUNDS[idx]; return !!(b&&b.dark); }
+function isCustomBg(v){ return typeof v==="string" && /^#?[0-9a-fA-F]{6}$/.test(v); }
+function trpBgColor(idx){
+  if(isCustomBg(idx)) return idx[0]==="#"?idx:("#"+idx);
+  const b=TRP_BACKGROUNDS[idx]; return (b&&b.c)?b.c:"";
+}
+function relLum(hex){ const h=hex.replace("#",""); const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+  return (0.2126*r+0.7152*g+0.0722*b)/255; }
+function trpBgIsDark(idx){
+  if(isCustomBg(idx)) return relLum(idx)<0.5;
+  const b=TRP_BACKGROUNDS[idx]; return !!(b&&b.dark);
+}
 
 
 /* ===== helpers ===== */
@@ -1020,7 +1032,27 @@ $("t1InsertLink").onclick=()=>{ const url=prompt("Link URL:","https://"); if(url
   const text=prompt("Link text:","")||url; insertAtCursor($("T1TX"),"{link*"+url+"*"+text+"}"); };
 function paintBgSwatch(idx){ const col=trpBgColor(idx), sw=$("bgSwatch");
   sw.style.backgroundImage=""; sw.style.backgroundColor = col || "#e3d3aa"; }
-$("BK").addEventListener("change",()=>{ A().BK=+$("BK").value; paintBgSwatch(A().BK); sync(); });
+function showCustomBg(show){
+  $("BKcustom").style.display=show?"inline-block":"none";
+  $("BKcustomHex").style.display=show?"inline-block":"none";
+}
+$("BK").addEventListener("change",()=>{
+  const v=$("BK").value;
+  if(v==="custom"){
+    // seed from current custom or a default; store as hex string
+    let hex = isCustomBg(A().BK) ? trpBgColor(A().BK) : "#2b2f2c";
+    A().BK = hex;
+    $("BKcustom").value=hex; $("BKcustomHex").value=hex.replace("#","");
+    showCustomBg(true);
+  } else {
+    A().BK = +v; showCustomBg(false);
+  }
+  paintBgSwatch(A().BK); sync();
+});
+$("BKcustom").addEventListener("input",()=>{ const hex=$("BKcustom").value; A().BK=hex;
+  $("BKcustomHex").value=hex.replace("#",""); paintBgSwatch(A().BK); sync(); });
+$("BKcustomHex").addEventListener("input",()=>{ let h=$("BKcustomHex").value.replace(/[^0-9a-fA-F]/g,"").slice(0,6);
+  $("BKcustomHex").value=h; if(hexOk(h)){ A().BK="#"+h; $("BKcustom").value="#"+h; paintBgSwatch(A().BK); sync(); } });
 function renderT2Editor(){
   const wrap=$("t2list"); wrap.innerHTML="";
   A().T2.forEach((c,i)=>{
@@ -1138,7 +1170,9 @@ function loadFormFromState(){
   renderMiscEditor(); renderPsyEditor(); renderGlanceEditor();
   const a=A();
   $("T1TX").value=a.T1.TX||""; $("T3PH").value=a.T3.PH.TX||""; $("T3PS").value=a.T3.PS.TX||""; $("T3HI").value=a.T3.HI.TX||"";
-  $("BK").value=String(a.BK||0); paintBgSwatch(a.BK||0);
+  if(isCustomBg(a.BK)){ const hex=trpBgColor(a.BK); $("BK").value="custom"; $("BKcustom").value=hex; $("BKcustomHex").value=hex.replace("#",""); showCustomBg(true); }
+  else { $("BK").value=String(a.BK||0); showCustomBg(false); }
+  paintBgSwatch(a.BK||0);
   renderT2Editor(); setTE(a.TE||1);
   $("CO").value=P.player.misc.CO||""; $("CU").value=P.player.misc.CU||"";
   sync();
