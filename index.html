@@ -418,10 +418,15 @@ function SAMPLE_PROFILE(){ return { player:{
           <div class="notice">TRP3 markup renders live: headers <b>{h1}…{/h1}</b>, colors <b>{col:d24b01}…{/col}</b>, paragraphs <b>{p:c}…{/p}</b>, images <b>{img:Interface\PETBATTLES\Weather-Windy:512:3}</b>, and inline icons <b>{icon:ability_creature_cursed_01:25}</b>. Use the buttons to insert image/icon tags.</div>
 
           <div id="te1wrap">
-            <div style="display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+            <div style="display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap;align-items:center">
               <button class="btn sm" data-insert="t1" id="t1InsertIcon">Insert icon</button>
               <button class="btn sm" data-insert="t1" id="t1InsertImg">Insert image</button>
               <button class="btn sm" data-insert="t1" id="t1InsertLink">Insert link</button>
+              <span style="display:inline-flex;align-items:center;gap:5px;border-left:1px solid var(--line);padding-left:8px">
+                <input type="color" id="t1ColHex" value="#010101" title="Text color" style="width:34px;height:28px">
+                <input type="text" id="t1ColHexText" maxlength="6" placeholder="010101" style="width:84px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;padding:5px 6px">
+                <button class="btn sm" id="t1InsertColor" title="Wrap selection (or insert) in a colored text tag">Color text</button>
+              </span>
             </div>
             <label class="f"><span>Description (TRP3 markup)</span>
               <textarea id="T1TX" style="min-height:300px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px"></textarea>
@@ -1030,6 +1035,30 @@ $("t1InsertImg").onclick=()=>openImageBrowser(im=>{
 });
 $("t1InsertLink").onclick=()=>{ const url=prompt("Link URL:","https://"); if(url==null) return;
   const text=prompt("Link text:","")||url; insertAtCursor($("T1TX"),"{link*"+url+"*"+text+"}"); };
+
+/* Wrap the current selection (or a placeholder) in a {col:hex}…{/col} tag. */
+function wrapColorAtCursor(hex){
+  const ta=$("T1TX");
+  const s=ta.selectionStart||0, e=ta.selectionEnd||0;
+  const selected=ta.value.slice(s,e);
+  const inner = selected || "your text here";
+  const open="{col:"+hex+"}", close="{/col}";
+  ta.value=ta.value.slice(0,s)+open+inner+close+ta.value.slice(e);
+  // select the inner text so the user can immediately type over the placeholder
+  const innerStart=s+open.length;
+  ta.selectionStart=innerStart; ta.selectionEnd=innerStart+inner.length;
+  ta.dispatchEvent(new Event("input")); ta.focus();
+}
+// keep the color swatch and hex text field in sync
+$("t1ColHex").addEventListener("input",()=>{ $("t1ColHexText").value=$("t1ColHex").value.replace("#",""); });
+$("t1ColHexText").addEventListener("input",()=>{ let h=$("t1ColHexText").value.replace(/[^0-9a-fA-F]/g,"").slice(0,6);
+  $("t1ColHexText").value=h; if(hexOk(h)) $("t1ColHex").value="#"+h; });
+$("t1InsertColor").onclick=()=>{
+  let h=$("t1ColHexText").value.replace(/[^0-9a-fA-F]/g,"").slice(0,6);
+  if(!hexOk(h)) h=$("t1ColHex").value.replace("#","");
+  if(!hexOk(h)){ toast("Enter a 6-digit hex color"); return; }
+  wrapColorAtCursor(h.toLowerCase());
+};
 function paintBgSwatch(idx){ const col=trpBgColor(idx), sw=$("bgSwatch");
   sw.style.backgroundImage=""; sw.style.backgroundColor = col || "#e3d3aa"; }
 function showCustomBg(show){
